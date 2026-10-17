@@ -1,0 +1,26 @@
+import { NextResponse } from "next/server";
+import { AppError } from "@/utils/AppError";
+import { readNotification } from "@/services/notifications/notificationService";
+
+export async function PATCH(req, { params }) {
+    try {
+        const userId = req.headers.get('x-user-id');
+        const { id } = await params;
+
+        const notifications = await readNotification(id, userId);
+
+        return NextResponse.json({
+            success: true,
+            data: notifications
+        }, { status: 200 });
+
+    } catch (error) {
+        console.error("PATCH NOTIFICATIONS READ ERROR:", error);
+
+        if (error instanceof AppError) {
+            return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
+        }
+
+        return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    }
+};

@@ -1,26 +1,441 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --df-paper: #f5f5f1;
+  --df-paper-2: #eeeeea;
+  --df-paper-3: #e7e8e3;
+
+  --df-black: #0f1110;
+  --df-ink: #151816;
+  --df-charcoal: #1a1d1b;
+
+  --df-text: #202421;
+  --df-text-strong: #111412;
+
+  --df-muted: #707671;
+  --df-soft: #999e99;
+
+  --df-line: rgba(32, 36, 33, 0.10);
+  --df-line-soft: rgba(32, 36, 33, 0.055);
+
+  --df-accent: #b9f45b;
+  --df-accent-hover: #c8fa78;
+
+  --df-max: 1440px;
+
+  --df-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  color-scheme: dark;
+
+  --df-paper: #0f1110;
+  --df-paper-2: #151816;
+  --df-paper-3: #1a1d1b;
+
+  --df-black: #090b0a;
+  --df-ink: #111311;
+  --df-charcoal: #191c1a;
+
+  --df-text: #e9ebe6;
+  --df-text-strong: #ffffff;
+
+  --df-muted: #929892;
+  --df-soft: #6f756f;
+
+  --df-line: rgba(255, 255, 255, 0.10);
+  --df-line-soft: rgba(255, 255, 255, 0.055);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  background: var(--df-paper);
+  color: var(--df-text);
+
+  transition:
+    background-color 450ms var(--df-ease),
+    color 450ms var(--df-ease);
+}
+
+* {
+  border-color: var(--df-line);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--df-accent);
+  color: #10130e;
+}
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.df-container {
+  width: 100%;
+  max-width: var(--df-max);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@media (min-width: 1024px) {
+  .df-container {
+    padding-inline: 40px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================================================
+   TYPOGRAPHY
+   ========================================================= */
+
+.df-display {
+  font-weight: 600;
+  letter-spacing: -0.075em;
+  line-height: 0.86;
+}
+
+.df-section-title {
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+}
+
+.df-eyebrow {
+  color: var(--df-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.df-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 46px;
+  padding: 0 20px;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+
+  transition:
+    transform 350ms var(--df-ease),
+    background-color 350ms var(--df-ease),
+    color 350ms var(--df-ease),
+    border-color 350ms var(--df-ease);
+}
+
+.df-btn:hover {
+  transform: translateY(-2px);
+}
+
+.df-btn-primary {
+  background: var(--df-black);
+  color: white;
+}
+
+.df-btn-primary:hover {
+  background: #252a27;
+}
+
+.df-btn-accent {
+  background: var(--df-accent);
+  color: #11140f;
+}
+
+.df-btn-accent:hover {
+  background: var(--df-accent-hover);
+}
+
+.df-btn-outline {
+  border: 1px solid var(--df-line);
+  background: rgba(255, 255, 255, 0.28);
+  color: var(--df-text);
+}
+
+.df-btn-outline:hover {
+  background: var(--df-paper-2);
+  border-color: rgba(32, 36, 33, 0.14);
+}
+
+/* =========================================================
+   TAGS
+   ========================================================= */
+
+.df-tag {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 27px;
+  padding: 0 9px;
+
+  border: 1px solid var(--df-line-soft);
+
+  background: rgba(255, 255, 255, 0.32);
+
+  color: var(--df-muted);
+
+  font-size: 10px;
+  font-weight: 500;
+
+  transition:
+    background-color 250ms var(--df-ease),
+    border-color 250ms var(--df-ease),
+    color 250ms var(--df-ease);
+}
+
+.df-tag:hover {
+  background: var(--df-paper-2);
+  border-color: var(--df-line);
+  color: var(--df-text);
+}
+
+/* =========================================================
+   HAIRLINES
+   ========================================================= */
+
+.df-line {
+  border-color: var(--df-line);
+}
+
+.df-line-soft {
+  border-color: var(--df-line-soft);
+}
+
+.df-line-dark {
+  border-color: var(--df-line-dark);
+}
+
+.df-line-dark-soft {
+  border-color: var(--df-line-dark-soft);
+}
+
+/* =========================================================
+   DOT
+   ========================================================= */
+
+.df-dot {
+  display: inline-block;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 999px;
+
+  background: var(--df-accent);
+
+  box-shadow:
+    0 0 0 5px rgba(185, 244, 91, 0.08),
+    0 0 18px rgba(185, 244, 91, 0.2);
+}
+
+/* =========================================================
+   JOB ROW
+   ========================================================= */
+
+.df-job-row {
+  position: relative;
+
+  border-top: 1px solid var(--df-line-soft);
+
+  transition:
+    background-color 450ms var(--df-ease),
+    padding-inline 450ms var(--df-ease);
+}
+
+.df-job-row:last-child {
+  border-bottom: 1px solid var(--df-line-soft);
+}
+
+.df-job-row:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+/* =========================================================
+   NETWORK
+   ========================================================= */
+
+.df-network {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid var(--df-line-dark-soft);
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(185, 244, 91, 0.035),
+      transparent 46%
+    ),
+    var(--df-charcoal);
+}
+
+.df-network-grid {
+  position: absolute;
+  inset: 0;
+
+  opacity: 0.45;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 56px 56px;
+}
+
+.df-network-node {
+  position: absolute;
+
+  transform: translate(-50%, -50%);
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  background: rgba(18, 21, 19, 0.9);
+
+  color: #dfe2dc;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  transition:
+    transform 500ms var(--df-ease),
+    background-color 500ms var(--df-ease),
+    border-color 500ms var(--df-ease),
+    color 500ms var(--df-ease);
+}
+
+.df-network-node:hover,
+.df-network-node.is-active {
+  transform: translate(-50%, -50%) translateY(-3px);
+
+  border-color: var(--df-accent);
+
+  background: var(--df-accent);
+
+  color: #10130e;
+}
+
+/* =========================================================
+   EDITORIAL LINK
+   ========================================================= */
+
+.df-link {
+  position: relative;
+
+  color: var(--df-text);
+}
+
+.df-link::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+
+  width: 100%;
+  height: 1px;
+
+  background: currentColor;
+
+  transform: scaleX(0);
+  transform-origin: right;
+
+  transition: transform 400ms var(--df-ease);
+}
+
+.df-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.df-number {
+  color: var(--df-soft);
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 0.15em;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--df-paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(32, 36, 33, 0.18);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(32, 36, 33, 0.3);
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .df-container {
+    padding-inline: 20px;
+  }
+
+  .df-btn {
+    min-height: 44px;
+    padding-inline: 17px;
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

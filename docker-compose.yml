@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: nextjs_redis_devflow
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight_devflow
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:

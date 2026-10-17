@@ -1,0 +1,620 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ROLE {
+  ADMIN
+  RECRUITER
+  DEVELOPER
+}
+
+enum LOCATION {
+  REMOTE
+  ONSITE
+  HYBRID
+}
+
+enum EmploymentType {
+  FULLTIME
+  PARTTIME
+  CONTRACT
+  INTERN
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+enum STATUS {
+  PENDING
+  REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum ActionType {
+  JOB_CREATED
+
+  APPLICATION_SUBMITTED
+  APPLICATION_RECEIVED
+  APPLICATION_STATUS_CHANGED
+
+  EMPLOYMENT_CREATED
+  EMPLOYMENT_RESIGNED
+  EMPLOYMENT_TERMINATED
+
+  RECRUITER_INVITED
+  RECRUITER_JOINED
+  RECRUITER_RESIGNED
+  RECRUITER_TERMINATED
+
+  COMPANY_VERIFIED
+}
+
+enum ReferenceType {
+  JOB
+  APPLICATION
+  EMPLOYMENT
+  EMPLOYMENT_EVENT
+  RECRUITER_HISTORY
+  RECRUITER_EVENT
+  COMPANY
+  INVITE
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  EXPIRED
+}
+
+enum VerificationType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum EmailType {
+  SEND_VERIFICATION_EMAIL
+  INVITATION_EMAIL
+  SEND_COMPANY_VERIFICATION_EMAIL
+  EMPLOYMENT_EVENT_EMAIL
+  APPLICATION_ACCEPTED_EMAIL
+  APPLICATION_REJECTED_EMAIL
+  COMPANY_JOIN_REQUEST_STATUS_EMAIL
+  RECRUITER_INVITE_STATUS_EMAIL
+}
+
+enum SkillCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  DEVOPS
+  MOBILE
+  DESIGN
+  OTHER
+}
+
+enum Industry {
+  TECHNOLOGY
+  FINANCE
+  HEALTHCARE
+  RETAIL
+  MANUFACTURING
+  TELECOMMUNICATIONS
+  REAL_ESTATE
+  LOGISTICS
+  EDUCATION
+  ENTERTAINMENT
+  ENERGY
+  CONSTRUCTION
+  CONSULTING
+  AGRICULTURE
+  GOVERNMENT
+}
+
+enum Country {
+  ARGENTINA
+  AUSTRALIA
+  AUSTRIA
+  BANGLADESH
+  BELGIUM
+  BRAZIL
+  CANADA
+  CHINA
+  DENMARK
+  EGYPT
+  FINLAND
+  FRANCE
+  GERMANY
+  GREECE
+  HONG_KONG
+  INDIA
+  INDONESIA
+  IRELAND
+  ITALY
+  JAPAN
+  MALAYSIA
+  MEXICO
+  NETHERLANDS
+  NEW_ZEALAND
+  NIGERIA
+  NORWAY
+  PAKISTAN
+  PHILIPPINES
+  POLAND
+  PORTUGAL
+  QATAR
+  RUSSIA
+  SAUDI_ARABIA
+  SINGAPORE
+  SOUTH_AFRICA
+  SOUTH_KOREA
+  SPAIN
+  SWEDEN
+  SWITZERLAND
+  TAIWAN
+  THAILAND
+  TURKEY
+  UKRAINE
+  UNITED_ARAB_EMIRATES
+  UNITED_KINGDOM
+  UNITED_STATES
+  VIETNAM
+}
+
+enum Currency {
+  USD
+  EUR
+  PKR
+  INR
+  GBP
+  AED
+}
+
+enum Type {
+  RESIGN
+  TERMINATE
+}
+
+enum EmailLogStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum LeaveStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum FileStatus {
+  TEMP
+  PERMANENT
+}
+
+enum FileType {
+  RESUME
+  COVER_LETTER
+  AVATAR
+}
+
+enum CompanyJoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  isVerified Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  role             ROLE              @default(DEVELOPER)
+  developerProfile DeveloperProfile?
+  recruiterProfile RecruiterProfile?
+  notifications    Notification[]
+  refreshToken     RefreshToken[]
+  files            File[]
+
+  @@index([role, isActive])
+  @@index([isVerified, isActive])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id          String    @id @default(uuid())
+  hashedToken String    @unique
+  revoked     Boolean   @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  lastUsedAt  DateTime?
+  deviceName  String?
+  ipAddress   String?
+  userAgent   String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model File {
+  id        String     @id @default(uuid())
+  key       String     @unique
+  userId    String
+  type      FileType
+  status    FileStatus @default(TEMP)
+  createdAt DateTime   @default(now())
+
+  // User Ownership
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  developerProfile DeveloperProfile?
+
+  applicationResumes      Application[]     @relation("AppResume")
+  applicationCoverLetters Application[]     @relation("AppCoverLetter")
+  recruiterProfile        RecruiterProfile?
+
+  @@index([userId])
+  @@index([status, createdAt])
+}
+
+model DeveloperProfile {
+  id                 String    @id @default(uuid())
+  userId             String    @unique
+  bio                String?
+  githubUrl          String?
+  portfolioUrl       String?
+  resumeId           String?   @unique
+  locationPreference LOCATION?
+  yearsOfExp         Decimal?
+
+  user              User                @relation(fields: [userId], references: [id])
+  employmentHistory EmploymentHistory[]
+  skills            Skill[]
+  savedJobs         SavedJob[]
+  applications      Application[]
+  resume            File?               @relation(fields: [resumeId], references: [id])
+
+  @@index([locationPreference])
+}
+
+model RecruiterProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  companyId          String?
+  bio                String?
+  jobTitle           String?
+  description        String?
+  githubUrl          String?
+  portfolioUrl       String?
+  resumeId           String?  @unique
+  locationPreference LOCATION
+  yearsOfExp         Decimal?
+  createdAt          DateTime @default(now())
+
+  ownedCompany     Company?           @relation("CompanyOwner")
+  user             User               @relation(fields: [userId], references: [id])
+  company          Company?           @relation("CompanyRecruiters", fields: [companyId], references: [id])
+  recruiterHistory RecruiterHistory[]
+  jobs             Job[]
+  resume           File?              @relation(fields: [resumeId], references: [id])
+
+  hiredEmployments EmploymentHistory[] @relation("EmploymentHiredBy")
+
+  approvedEmploymentEvents EmployementEvent[] @relation("EmploymentApprovedBy")
+
+  approvedRecruiterEvents  RecruiterEvent[]     @relation("RecruiterApprovedBy")
+  recruiterInvitesReceived RecruiterInvite[]    @relation("RecruiterInviteTarget")
+  recruiterInvitesSender   RecruiterInvite[]    @relation("RecruiterInviteSender")
+  companyJoinRequests      CompanyJoinRequest[]
+
+  @@index([companyId])
+  @@index([locationPreference])
+}
+
+model RecruiterInvite {
+  id                   String         @id @default(uuid())
+  companyId            String
+  recruiterId          String?
+  invitedByRecruiterId String
+  invitedEmail         String
+  roleTitle            String
+  salary               Decimal?
+  currency             Currency?
+  employmentType       EmploymentType
+  description          String?
+  status               InviteStatus   @default(PENDING)
+  expiresAt            DateTime
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  company   Company           @relation(fields: [companyId], references: [id])
+  recruiter RecruiterProfile? @relation("RecruiterInviteTarget", fields: [recruiterId], references: [id])
+  invitedBy RecruiterProfile  @relation("RecruiterInviteSender", fields: [invitedByRecruiterId], references: [id])
+
+  @@index([invitedEmail])
+  @@index([recruiterId])
+  @@index([companyId])
+}
+
+model CompanyJoinRequest {
+  id String @id @default(uuid())
+
+  recruiterId String
+  companyId   String
+
+  message String?
+
+  status CompanyJoinRequestStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recruiter RecruiterProfile @relation(fields: [recruiterId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([recruiterId, companyId])
+  @@index([companyId, status])
+  @@index([recruiterId, status])
+}
+
+model Company {
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  description         String?
+  logo                String?
+  websiteUrl          String               @unique
+  industry            Industry
+  country             Country
+  isVerified          Boolean              @default(false)
+  ownerId             String               @unique
+  owner               RecruiterProfile     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  createdAt           DateTime             @default(now())
+  recruiters          RecruiterProfile[]   @relation("CompanyRecruiters")
+  employmentHistory   EmploymentHistory[]
+  recruiterHistory    RecruiterHistory[]
+  jobs                Job[]
+  recruiterInvites    RecruiterInvite[]
+  companyJoinRequests CompanyJoinRequest[]
+
+  @@index([industry])
+  @@index([country])
+  @@index([isVerified])
+  @@index([isVerified, industry, country])
+}
+
+model EmploymentHistory {
+  id                 String         @id @default(uuid())
+  devProfileId       String
+  companyId          String
+  hiredByRecruiterId String
+  roleTitle          String
+  employmentType     EmploymentType
+  salary             Decimal?
+  currency           Currency?
+  description        String?
+  startDate          DateTime?
+  endDate            DateTime?
+  isCurrent          Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+
+  developer DeveloperProfile @relation(fields: [devProfileId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  hiredByRecruiter RecruiterProfile @relation("EmploymentHiredBy", fields: [hiredByRecruiterId], references: [id])
+
+  employmentEvents EmployementEvent[]
+}
+
+model RecruiterHistory {
+  id                 String         @id @default(uuid())
+  recruiterProfileId String
+  companyId          String
+  roleTitle          String
+  employmentType     EmploymentType
+  salary             Decimal?
+  currency           Currency?
+  description        String?
+  startDate          DateTime?
+  endDate            DateTime?
+  isCurrent          Boolean        @default(false)
+  isOwner            Boolean        @default(false)
+
+  recruiter RecruiterProfile @relation(fields: [recruiterProfileId], references: [id])
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  recruiterEvents RecruiterEvent[]
+}
+
+model EmployementEvent {
+  id                    String      @id @default(uuid())
+  employmentHistoryId   String
+  type                  Type
+  reason                String
+  letterUrl             String?
+  status                LeaveStatus @default(PENDING)
+  approvedByRecruiterId String?
+  createdAt             DateTime    @default(now())
+
+  employmentHistory EmploymentHistory @relation(fields: [employmentHistoryId], references: [id])
+
+  approvedBy RecruiterProfile? @relation("EmploymentApprovedBy", fields: [approvedByRecruiterId], references: [id])
+}
+
+model RecruiterEvent {
+  id                    String      @id @default(uuid())
+  recruiterHistoryId    String
+  type                  Type
+  reason                String
+  letterUrl             String?
+  status                LeaveStatus @default(PENDING)
+  approvedByRecruiterId String?
+  createdAt             DateTime    @default(now())
+
+  recruiterHistory RecruiterHistory @relation(fields: [recruiterHistoryId], references: [id])
+
+  approvedBy RecruiterProfile? @relation("RecruiterApprovedBy", fields: [approvedByRecruiterId], references: [id])
+}
+
+model Skill {
+  id       String        @id @default(uuid())
+  name     String        @unique
+  isActive Boolean       @default(true)
+  category SkillCategory
+
+  developerProfiles DeveloperProfile[]
+  jobs              Job[]
+
+  @@index([category])
+  @@index([name])
+}
+
+model Job {
+  id                 String          @id @default(uuid())
+  recruiterId        String
+  companyId          String
+  title              String
+  description        String
+  employmentType     EmploymentType  @default(FULLTIME)
+  experienceLevel    ExperienceLevel
+  locationPreference LOCATION
+  status             JobStatus       @default(DRAFT)
+  minSalary          Decimal
+  maxSalary          Decimal
+  currency           Currency        @default(USD)
+  isFeatured         Boolean         @default(false)
+  deadline           DateTime
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  publishedAt        DateTime        @default(now())
+
+  recruiter    RecruiterProfile @relation(fields: [recruiterId], references: [id])
+  company      Company          @relation(fields: [companyId], references: [id])
+  skills       Skill[]
+  savedBy      SavedJob[]
+  applications Application[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([recruiterId])
+  @@index([companyId])
+  @@index([locationPreference])
+  @@index([employmentType])
+  @@index([experienceLevel])
+  @@index([deadline])
+  @@index([status, locationPreference, experienceLevel])
+  @@index([status, employmentType, experienceLevel])
+  @@index([companyId, status])
+}
+
+model Application {
+  id              String   @id @default(uuid())
+  jobId           String
+  devProfileId    String
+  rejectionReason String?
+  coverLetterId   String?
+  resumeId        String?
+  status          STATUS   @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  job              Job              @relation(fields: [jobId], references: [id])
+  developerProfile DeveloperProfile @relation(fields: [devProfileId], references: [id])
+
+  resume      File? @relation("AppResume", fields: [resumeId], references: [id])
+  coverLetter File? @relation("AppCoverLetter", fields: [coverLetterId], references: [id])
+
+  @@unique([jobId, devProfileId])
+  @@index([jobId])
+  @@index([devProfileId])
+  @@index([status])
+  @@index([jobId, status])
+  @@index([devProfileId, status])
+  @@index([createdAt])
+}
+
+model Notification {
+  id            String        @id @default(uuid())
+  recipientId   String
+  actionType    ActionType
+  referenceType ReferenceType
+  referenceId   String
+  message       String
+  isRead        Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  recipient User @relation(fields: [recipientId], references: [id])
+
+  @@index([recipientId, createdAt(sort: Desc)])
+  @@index([recipientId, isRead])
+  @@index([actionType])
+  @@index([referenceId])
+}
+
+model VerificationOtp {
+  id        String           @id @default(uuid())
+  email     String
+  otp       String
+  type      VerificationType
+  expiresAt DateTime
+  createdAt DateTime         @default(now())
+
+  @@index([email, type])
+  @@index([expiresAt])
+}
+
+model EmailLog {
+  id           String         @id @default(uuid())
+  email        String
+  status       EmailLogStatus
+  type         EmailType
+  errorMessage String?
+  createdAt    DateTime       @default(now())
+}
+
+model SavedJob {
+  id           String   @id @default(uuid())
+  devProfileId String
+  jobId        String
+  createdAt    DateTime @default(now())
+
+  developer DeveloperProfile @relation(fields: [devProfileId], references: [id], onDelete: Cascade)
+  job       Job              @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([devProfileId, jobId])
+  @@index([devProfileId])
+  @@index([jobId])
+}
