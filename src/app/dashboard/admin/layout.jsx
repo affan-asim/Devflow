@@ -21,6 +21,7 @@ import {
   Users,
   X,
   Workflow,
+  Code2,
 } from "lucide-react";
 
 const navigation = [
@@ -37,6 +38,7 @@ const navigation = [
       { label: "Companies", href: "/dashboard/admin/companies", icon: Building2 },
       { label: "Jobs", href: "/dashboard/admin/jobs", icon: BriefcaseBusiness },
       { label: "Applications", href: "/dashboard/admin/applications", icon: FileText },
+      { label: "Skills", href: "/dashboard/admin/skills", icon: Code2 },
     ],
   },
   {

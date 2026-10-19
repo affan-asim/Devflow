@@ -490,11 +490,12 @@ model RecruiterEvent {
 }
 
 model Skill {
-  id       String        @id @default(uuid())
-  name     String        @unique
-  isActive Boolean       @default(true)
-  category SkillCategory
-
+  id                String             @id @default(uuid())
+  name              String             @unique
+  isActive          Boolean            @default(true)
+  category          SkillCategory
+  createdAt         DateTime?           @default(now())
+  updatedAt         DateTime?           @updatedAt
   developerProfiles DeveloperProfile[]
   jobs              Job[]
 

@@ -39,6 +39,17 @@ export const fetchSkillById = createAsyncThunk(
   }
 );
 
+const getErrorMessage = (error, fallback) => {
+  const data = error.response?.data;
+  if (!data) return error.message || fallback;
+
+  if (Array.isArray(data.details) && data.details.length > 0) {
+    return data.details.map((d) => d.message || `${d.field}: invalid`).join(", ");
+  }
+
+  return data.error || data.message || error.message || fallback;
+};
+
 /**
  * Admin: Create a new skill catalog item
  */
@@ -46,11 +57,11 @@ export const createSkill = createAsyncThunk(
   "skills/createSkill",
   async (skillData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/api/admin/skills", skillData);
+      const response = await api.post("/api/skills/admin", skillData);
       return response.data; // Expects { success: true, data: { ...newSkill } }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to create skill"
+        getErrorMessage(error, "Failed to create skill")
       );
     }
   }
@@ -63,11 +74,11 @@ export const updateSkill = createAsyncThunk(
   "skills/updateSkill",
   async ({ id, name, category }, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/api/admin/skills/${id}`, { name, category });
+      const response = await api.patch(`/api/skills/admin/${id}`, { name, category });
       return response.data; // Expects { success: true, data: { ...updatedSkill } }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update skill"
+        getErrorMessage(error, "Failed to update skill")
       );
     }
   }
@@ -80,15 +91,54 @@ export const deleteSkill = createAsyncThunk(
   "skills/deleteSkill",
   async (skillId, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/api/admin/skills/${skillId}`);
+      const response = await api.delete(`/api/skills/admin/${skillId}`);
       return { id: skillId, data: response.data };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to delete skill"
+        getErrorMessage(error, "Failed to delete skill")
       );
     }
   }
 );
+
+
+/**
+ * Admin: Fetch the full skill catalog, including inactive skills.
+ * Expected response: { success: true, data: { skills: [], metadata: {} } }
+ */
+export const fetchAdminSkills = createAsyncThunk(
+  "skills/fetchAdminSkills",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/api/skills/admin", { params });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch admin skills")
+      );
+    }
+  }
+);
+
+/**
+ * Admin: Fetch one skill, including inactive records and usage information.
+ */
+export const fetchAdminSkillById = createAsyncThunk(
+  "skills/fetchAdminSkillById",
+  async (skillId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(
+        `/api/skills/admin/${encodeURIComponent(skillId)}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch skill details")
+      );
+    }
+  }
+);
+
 
 // ==========================================
 // INITIAL STATE
@@ -152,6 +202,46 @@ const skillSlice = createSlice({
         state.errorList = action.payload;
       })
 
+
+      .addCase(fetchAdminSkills.pending, (state) => {
+        state.loadingList = true;
+        state.errorList = null;
+      })
+      .addCase(fetchAdminSkills.fulfilled, (state, action) => {
+        state.loadingList = false;
+        state.skills =
+          action.payload?.data?.skills ??
+          action.payload?.skills ??
+          [];
+        state.metadata =
+          action.payload?.data?.metadata ??
+          action.payload?.metadata ??
+          state.metadata;
+      })
+      .addCase(fetchAdminSkills.rejected, (state, action) => {
+        state.loadingList = false;
+        state.errorList = action.payload || action.error?.message;
+      })
+      .addCase(fetchAdminSkillById.pending, (state) => {
+        state.loadingDetail = true;
+        state.errorDetail = null;
+        state.currentSkill = null;
+      })
+      .addCase(fetchAdminSkillById.fulfilled, (state, action) => {
+        state.loadingDetail = false;
+        state.currentSkill =
+          action.payload?.data?.skill ??
+          action.payload?.data ??
+          action.payload?.skill ??
+          null;
+      })
+      .addCase(fetchAdminSkillById.rejected, (state, action) => {
+        state.loadingDetail = false;
+        state.currentSkill = null;
+        state.errorDetail = action.payload || action.error?.message;
+      })
+
+
       // --- Fetch Single Skill Detail ---
       .addCase(fetchSkillById.pending, (state) => {
         state.loadingDetail = true;
@@ -210,14 +300,25 @@ const skillSlice = createSlice({
         state.submitting = true;
         state.submitError = null;
       })
+
       .addCase(deleteSkill.fulfilled, (state, action) => {
         state.submitting = false;
         const deletedId = action.payload.id;
-        state.skills = state.skills.filter((s) => s.id !== deletedId);
-        if (state.currentSkill?.id === deletedId) {
-          state.currentSkill = null;
+        const updated = action.payload.data?.data ?? action.payload.data?.skill ?? action.payload.data;
+
+        if (updated && typeof updated === "object" && updated.id) {
+          state.skills = state.skills.map((skill) =>
+            skill.id === updated.id ? updated : skill
+          );
+
+          if (state.currentSkill?.id === updated.id) {
+            state.currentSkill = updated;
+          }
+        } else {
+          state.skills = state.skills.filter((skill) => skill.id !== deletedId);
         }
       })
+
       .addCase(deleteSkill.rejected, (state, action) => {
         state.submitting = false;
         state.submitError = action.payload;
