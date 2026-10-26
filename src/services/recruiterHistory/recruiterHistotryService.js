@@ -10,9 +10,7 @@ import crypto from "crypto";
 import { redis } from "@/lib/redis";
 import { userKey } from "@/utils/redisKeyNames";
 
-// import prisma from "@/utils/prisma";
-const prisma = new PrismaClient()
-
+import prisma from "@/utils/prisma";
 export const getRecruiterHistory = async (searchParams, userId) => {
     const employmentType = searchParams.get("employmentType");
     const search = searchParams.get("search");
@@ -119,6 +117,7 @@ export const getRecruiterHistory = async (searchParams, userId) => {
                 not: profile.id
             }
         },
+        isCurrent:true
     };
 
     if (employmentType) {
@@ -513,7 +512,7 @@ export const createInvitation = async (userId, data) => {
 
     const uuid = crypto.randomUUID();
 
-    await emailQueue.add("invitation-email", { email: invitedEmail, name: user?.name, invitation, uuid });
+    await emailQueue.add("invitation-email", { email: invitedEmail, name: user?.name, invitation, uuid }, { jobId: uuid });
 
     return invitation;
 };
@@ -865,6 +864,7 @@ export const recievedInvitation = async (userId, data, id) => {
         });
 
         try {
+            const jobId = crypto.randomUUID();
             await emailQueue.add("recruiter-invite-status-email", {
                 email: company.owner.user.email,
                 ownerName: company.owner.user.name,
@@ -872,8 +872,8 @@ export const recievedInvitation = async (userId, data, id) => {
                 companyName: company.name,
                 roleTitle: invitation.roleTitle,
                 status,
-                uuid: crypto.randomUUID(),
-            });
+                uuid: jobId,
+            }, { jobId });
         } catch (error) {
             console.error("Failed to queue recruiter invitation status email:", error);
         }
@@ -896,7 +896,6 @@ export const recievedInvitation = async (userId, data, id) => {
     }
 
     if (status === InviteStatus.ACCEPTED) {
-        await redis.get(`${userKey}:${userId}`);
         const updateInvitation = await prisma.$transaction(async (tx) => {
             const { count } = await tx.recruiterInvite.updateMany({
                 where: { id, recruiterId: profile.id, status: InviteStatus.PENDING },
@@ -951,7 +950,16 @@ export const recievedInvitation = async (userId, data, id) => {
             return invitation;
         });
 
+        // Invalidate the cached /api/auth/me response so the recruiter's
+        // updated companyId is reflected immediately on next request.
         try {
+            await redis.del(`${userKey}:${userId}`);
+        } catch (cacheError) {
+            console.error("Failed to invalidate user cache after invitation accept:", cacheError);
+        }
+
+        try {
+            const jobId = crypto.randomUUID();
             await emailQueue.add("recruiter-invite-status-email", {
                 email: company.owner.user.email,
                 ownerName: company.owner.user.name,
@@ -959,8 +967,8 @@ export const recievedInvitation = async (userId, data, id) => {
                 companyName: company.name,
                 roleTitle: invitation.roleTitle,
                 status,
-                uuid: crypto.randomUUID(),
-            });
+                uuid: jobId,
+            }, { jobId });
         } catch (error) {
             console.error("Failed to queue recruiter invitation status email:", error);
         }

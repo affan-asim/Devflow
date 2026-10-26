@@ -1,0 +1,3258 @@
+{
+  "tables": {
+    "User": {
+      "name": "User",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isVerified": {
+          "name": "isVerified",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "default": true,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "role": {
+          "name": "role",
+          "type": "ROLE",
+          "default": "DEVELOPER",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "User_pkey": {
+          "name": "User_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "User_email_key": {
+          "name": "User_email_key",
+          "unique": true,
+          "columns": [
+            "email"
+          ],
+          "type": ""
+        },
+        "User_role_isActive_idx": {
+          "name": "User_role_isActive_idx",
+          "unique": false,
+          "columns": [
+            "role",
+            "isActive"
+          ],
+          "type": ""
+        },
+        "User_isVerified_isActive_idx": {
+          "name": "User_isVerified_isActive_idx",
+          "unique": false,
+          "columns": [
+            "isVerified",
+            "isActive"
+          ],
+          "type": ""
+        },
+        "User_createdAt_idx": {
+          "name": "User_createdAt_idx",
+          "unique": false,
+          "columns": [
+            "createdAt"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_email": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_email",
+          "columnNames": [
+            "email"
+          ]
+        }
+      }
+    },
+    "RefreshToken": {
+      "name": "RefreshToken",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "hashedToken": {
+          "name": "hashedToken",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "revoked": {
+          "name": "revoked",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "lastUsedAt": {
+          "name": "lastUsedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "deviceName": {
+          "name": "deviceName",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "ipAddress": {
+          "name": "ipAddress",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "userAgent": {
+          "name": "userAgent",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "RefreshToken_pkey": {
+          "name": "RefreshToken_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "RefreshToken_hashedToken_key": {
+          "name": "RefreshToken_hashedToken_key",
+          "unique": true,
+          "columns": [
+            "hashedToken"
+          ],
+          "type": ""
+        },
+        "RefreshToken_userId_idx": {
+          "name": "RefreshToken_userId_idx",
+          "unique": false,
+          "columns": [
+            "userId"
+          ],
+          "type": ""
+        },
+        "RefreshToken_expiresAt_idx": {
+          "name": "RefreshToken_expiresAt_idx",
+          "unique": false,
+          "columns": [
+            "expiresAt"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_hashedToken": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_hashedToken",
+          "columnNames": [
+            "hashedToken"
+          ]
+        },
+        "RefreshTokenToUser": {
+          "type": "FOREIGN KEY",
+          "name": "RefreshTokenToUser",
+          "columnNames": [
+            "userId"
+          ],
+          "targetTableName": "User",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "CASCADE"
+        }
+      }
+    },
+    "File": {
+      "name": "File",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "type": {
+          "name": "type",
+          "type": "FileType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "FileStatus",
+          "default": "TEMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "File_pkey": {
+          "name": "File_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "File_key_key": {
+          "name": "File_key_key",
+          "unique": true,
+          "columns": [
+            "key"
+          ],
+          "type": ""
+        },
+        "File_userId_idx": {
+          "name": "File_userId_idx",
+          "unique": false,
+          "columns": [
+            "userId"
+          ],
+          "type": ""
+        },
+        "File_status_createdAt_idx": {
+          "name": "File_status_createdAt_idx",
+          "unique": false,
+          "columns": [
+            "status",
+            "createdAt"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_key": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_key",
+          "columnNames": [
+            "key"
+          ]
+        },
+        "FileToUser": {
+          "type": "FOREIGN KEY",
+          "name": "FileToUser",
+          "columnNames": [
+            "userId"
+          ],
+          "targetTableName": "User",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "CASCADE"
+        }
+      }
+    },
+    "DeveloperProfile": {
+      "name": "DeveloperProfile",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "githubUrl": {
+          "name": "githubUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "portfolioUrl": {
+          "name": "portfolioUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "resumeId": {
+          "name": "resumeId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "locationPreference": {
+          "name": "locationPreference",
+          "type": "LOCATION",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "yearsOfExp": {
+          "name": "yearsOfExp",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "DeveloperProfile_pkey": {
+          "name": "DeveloperProfile_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "DeveloperProfile_userId_key": {
+          "name": "DeveloperProfile_userId_key",
+          "unique": true,
+          "columns": [
+            "userId"
+          ],
+          "type": ""
+        },
+        "DeveloperProfile_resumeId_key": {
+          "name": "DeveloperProfile_resumeId_key",
+          "unique": true,
+          "columns": [
+            "resumeId"
+          ],
+          "type": ""
+        },
+        "DeveloperProfile_locationPreference_idx": {
+          "name": "DeveloperProfile_locationPreference_idx",
+          "unique": false,
+          "columns": [
+            "locationPreference"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_userId": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_userId",
+          "columnNames": [
+            "userId"
+          ]
+        },
+        "UNIQUE_resumeId": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_resumeId",
+          "columnNames": [
+            "resumeId"
+          ]
+        },
+        "DeveloperProfileToUser": {
+          "type": "FOREIGN KEY",
+          "name": "DeveloperProfileToUser",
+          "columnNames": [
+            "userId"
+          ],
+          "targetTableName": "User",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "DeveloperProfileToFile": {
+          "type": "FOREIGN KEY",
+          "name": "DeveloperProfileToFile",
+          "columnNames": [
+            "resumeId"
+          ],
+          "targetTableName": "File",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "RecruiterProfile": {
+      "name": "RecruiterProfile",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "jobTitle": {
+          "name": "jobTitle",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "githubUrl": {
+          "name": "githubUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "portfolioUrl": {
+          "name": "portfolioUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "resumeId": {
+          "name": "resumeId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "locationPreference": {
+          "name": "locationPreference",
+          "type": "LOCATION",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "yearsOfExp": {
+          "name": "yearsOfExp",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "RecruiterProfile_pkey": {
+          "name": "RecruiterProfile_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "RecruiterProfile_userId_key": {
+          "name": "RecruiterProfile_userId_key",
+          "unique": true,
+          "columns": [
+            "userId"
+          ],
+          "type": ""
+        },
+        "RecruiterProfile_resumeId_key": {
+          "name": "RecruiterProfile_resumeId_key",
+          "unique": true,
+          "columns": [
+            "resumeId"
+          ],
+          "type": ""
+        },
+        "RecruiterProfile_companyId_idx": {
+          "name": "RecruiterProfile_companyId_idx",
+          "unique": false,
+          "columns": [
+            "companyId"
+          ],
+          "type": ""
+        },
+        "RecruiterProfile_locationPreference_idx": {
+          "name": "RecruiterProfile_locationPreference_idx",
+          "unique": false,
+          "columns": [
+            "locationPreference"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_userId": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_userId",
+          "columnNames": [
+            "userId"
+          ]
+        },
+        "UNIQUE_resumeId": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_resumeId",
+          "columnNames": [
+            "resumeId"
+          ]
+        },
+        "RecruiterProfileToUser": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterProfileToUser",
+          "columnNames": [
+            "userId"
+          ],
+          "targetTableName": "User",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "CompanyRecruiters": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyRecruiters",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "FileToRecruiterProfile": {
+          "type": "FOREIGN KEY",
+          "name": "FileToRecruiterProfile",
+          "columnNames": [
+            "resumeId"
+          ],
+          "targetTableName": "File",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "RecruiterInvite": {
+      "name": "RecruiterInvite",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recruiterId": {
+          "name": "recruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "invitedByRecruiterId": {
+          "name": "invitedByRecruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "invitedEmail": {
+          "name": "invitedEmail",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "roleTitle": {
+          "name": "roleTitle",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "salary": {
+          "name": "salary",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "currency": {
+          "name": "currency",
+          "type": "Currency",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "employmentType": {
+          "name": "employmentType",
+          "type": "EmploymentType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "InviteStatus",
+          "default": "PENDING",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "RecruiterInvite_pkey": {
+          "name": "RecruiterInvite_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "RecruiterInvite_invitedEmail_idx": {
+          "name": "RecruiterInvite_invitedEmail_idx",
+          "unique": false,
+          "columns": [
+            "invitedEmail"
+          ],
+          "type": ""
+        },
+        "RecruiterInvite_recruiterId_idx": {
+          "name": "RecruiterInvite_recruiterId_idx",
+          "unique": false,
+          "columns": [
+            "recruiterId"
+          ],
+          "type": ""
+        },
+        "RecruiterInvite_companyId_idx": {
+          "name": "RecruiterInvite_companyId_idx",
+          "unique": false,
+          "columns": [
+            "companyId"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "CompanyToRecruiterInvite": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyToRecruiterInvite",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "RecruiterInviteTarget": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterInviteTarget",
+          "columnNames": [
+            "recruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "RecruiterInviteSender": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterInviteSender",
+          "columnNames": [
+            "invitedByRecruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "CompanyJoinRequest": {
+      "name": "CompanyJoinRequest",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recruiterId": {
+          "name": "recruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "CompanyJoinRequestStatus",
+          "default": "PENDING",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "CompanyJoinRequest_pkey": {
+          "name": "CompanyJoinRequest_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "CompanyJoinRequest_companyId_status_idx": {
+          "name": "CompanyJoinRequest_companyId_status_idx",
+          "unique": false,
+          "columns": [
+            "companyId",
+            "status"
+          ],
+          "type": ""
+        },
+        "CompanyJoinRequest_recruiterId_status_idx": {
+          "name": "CompanyJoinRequest_recruiterId_status_idx",
+          "unique": false,
+          "columns": [
+            "recruiterId",
+            "status"
+          ],
+          "type": ""
+        },
+        "CompanyJoinRequest_recruiterId_companyId_key": {
+          "name": "CompanyJoinRequest_recruiterId_companyId_key",
+          "unique": true,
+          "columns": [
+            "recruiterId",
+            "companyId"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "CompanyJoinRequestToRecruiterProfile": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyJoinRequestToRecruiterProfile",
+          "columnNames": [
+            "recruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "CompanyToCompanyJoinRequest": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyToCompanyJoinRequest",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "Company": {
+      "name": "Company",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "logo": {
+          "name": "logo",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "websiteUrl": {
+          "name": "websiteUrl",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "industry": {
+          "name": "industry",
+          "type": "Industry",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "country": {
+          "name": "country",
+          "type": "Country",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isVerified": {
+          "name": "isVerified",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "ownerId": {
+          "name": "ownerId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "Company_pkey": {
+          "name": "Company_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "Company_name_key": {
+          "name": "Company_name_key",
+          "unique": true,
+          "columns": [
+            "name"
+          ],
+          "type": ""
+        },
+        "Company_websiteUrl_key": {
+          "name": "Company_websiteUrl_key",
+          "unique": true,
+          "columns": [
+            "websiteUrl"
+          ],
+          "type": ""
+        },
+        "Company_ownerId_key": {
+          "name": "Company_ownerId_key",
+          "unique": true,
+          "columns": [
+            "ownerId"
+          ],
+          "type": ""
+        },
+        "Company_industry_idx": {
+          "name": "Company_industry_idx",
+          "unique": false,
+          "columns": [
+            "industry"
+          ],
+          "type": ""
+        },
+        "Company_country_idx": {
+          "name": "Company_country_idx",
+          "unique": false,
+          "columns": [
+            "country"
+          ],
+          "type": ""
+        },
+        "Company_isVerified_idx": {
+          "name": "Company_isVerified_idx",
+          "unique": false,
+          "columns": [
+            "isVerified"
+          ],
+          "type": ""
+        },
+        "Company_isVerified_industry_country_idx": {
+          "name": "Company_isVerified_industry_country_idx",
+          "unique": false,
+          "columns": [
+            "isVerified",
+            "industry",
+            "country"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_name": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_name",
+          "columnNames": [
+            "name"
+          ]
+        },
+        "UNIQUE_websiteUrl": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_websiteUrl",
+          "columnNames": [
+            "websiteUrl"
+          ]
+        },
+        "UNIQUE_ownerId": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_ownerId",
+          "columnNames": [
+            "ownerId"
+          ]
+        },
+        "CompanyOwner": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyOwner",
+          "columnNames": [
+            "ownerId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "EmploymentHistory": {
+      "name": "EmploymentHistory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "devProfileId": {
+          "name": "devProfileId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "hiredByRecruiterId": {
+          "name": "hiredByRecruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "roleTitle": {
+          "name": "roleTitle",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "employmentType": {
+          "name": "employmentType",
+          "type": "EmploymentType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "salary": {
+          "name": "salary",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "currency": {
+          "name": "currency",
+          "type": "Currency",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "isCurrent": {
+          "name": "isCurrent",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "EmploymentHistory_pkey": {
+          "name": "EmploymentHistory_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "DeveloperProfileToEmploymentHistory": {
+          "type": "FOREIGN KEY",
+          "name": "DeveloperProfileToEmploymentHistory",
+          "columnNames": [
+            "devProfileId"
+          ],
+          "targetTableName": "DeveloperProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "CompanyToEmploymentHistory": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyToEmploymentHistory",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "EmploymentHiredBy": {
+          "type": "FOREIGN KEY",
+          "name": "EmploymentHiredBy",
+          "columnNames": [
+            "hiredByRecruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "RecruiterHistory": {
+      "name": "RecruiterHistory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recruiterProfileId": {
+          "name": "recruiterProfileId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "roleTitle": {
+          "name": "roleTitle",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "employmentType": {
+          "name": "employmentType",
+          "type": "EmploymentType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "salary": {
+          "name": "salary",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "currency": {
+          "name": "currency",
+          "type": "Currency",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "isCurrent": {
+          "name": "isCurrent",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isOwner": {
+          "name": "isOwner",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "RecruiterHistory_pkey": {
+          "name": "RecruiterHistory_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "RecruiterHistoryToRecruiterProfile": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterHistoryToRecruiterProfile",
+          "columnNames": [
+            "recruiterProfileId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "CompanyToRecruiterHistory": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyToRecruiterHistory",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "EmployementEvent": {
+      "name": "EmployementEvent",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "employmentHistoryId": {
+          "name": "employmentHistoryId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "type": {
+          "name": "type",
+          "type": "Type",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "letterUrl": {
+          "name": "letterUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "LeaveStatus",
+          "default": "PENDING",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "approvedByRecruiterId": {
+          "name": "approvedByRecruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "EmployementEvent_pkey": {
+          "name": "EmployementEvent_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "EmployementEventToEmploymentHistory": {
+          "type": "FOREIGN KEY",
+          "name": "EmployementEventToEmploymentHistory",
+          "columnNames": [
+            "employmentHistoryId"
+          ],
+          "targetTableName": "EmploymentHistory",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "EmploymentApprovedBy": {
+          "type": "FOREIGN KEY",
+          "name": "EmploymentApprovedBy",
+          "columnNames": [
+            "approvedByRecruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "RecruiterEvent": {
+      "name": "RecruiterEvent",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recruiterHistoryId": {
+          "name": "recruiterHistoryId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "type": {
+          "name": "type",
+          "type": "Type",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "letterUrl": {
+          "name": "letterUrl",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "LeaveStatus",
+          "default": "PENDING",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "approvedByRecruiterId": {
+          "name": "approvedByRecruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "RecruiterEvent_pkey": {
+          "name": "RecruiterEvent_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "RecruiterEventToRecruiterHistory": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterEventToRecruiterHistory",
+          "columnNames": [
+            "recruiterHistoryId"
+          ],
+          "targetTableName": "RecruiterHistory",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "RecruiterApprovedBy": {
+          "type": "FOREIGN KEY",
+          "name": "RecruiterApprovedBy",
+          "columnNames": [
+            "approvedByRecruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "Skill": {
+      "name": "Skill",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "default": true,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "category": {
+          "name": "category",
+          "type": "SkillCategory",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "Skill_pkey": {
+          "name": "Skill_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "Skill_name_key": {
+          "name": "Skill_name_key",
+          "unique": true,
+          "columns": [
+            "name"
+          ],
+          "type": ""
+        },
+        "Skill_category_idx": {
+          "name": "Skill_category_idx",
+          "unique": false,
+          "columns": [
+            "category"
+          ],
+          "type": ""
+        },
+        "Skill_name_idx": {
+          "name": "Skill_name_idx",
+          "unique": false,
+          "columns": [
+            "name"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "UNIQUE_name": {
+          "type": "UNIQUE",
+          "name": "UNIQUE_name",
+          "columnNames": [
+            "name"
+          ]
+        }
+      }
+    },
+    "Job": {
+      "name": "Job",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recruiterId": {
+          "name": "recruiterId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "companyId": {
+          "name": "companyId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "employmentType": {
+          "name": "employmentType",
+          "type": "EmploymentType",
+          "default": "FULLTIME",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "experienceLevel": {
+          "name": "experienceLevel",
+          "type": "ExperienceLevel",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "locationPreference": {
+          "name": "locationPreference",
+          "type": "LOCATION",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "JobStatus",
+          "default": "DRAFT",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "minSalary": {
+          "name": "minSalary",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "maxSalary": {
+          "name": "maxSalary",
+          "type": "decimal(65,30)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "currency": {
+          "name": "currency",
+          "type": "Currency",
+          "default": "USD",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isFeatured": {
+          "name": "isFeatured",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "deadline": {
+          "name": "deadline",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "publishedAt": {
+          "name": "publishedAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "Job_pkey": {
+          "name": "Job_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "Job_status_createdAt_idx": {
+          "name": "Job_status_createdAt_idx",
+          "unique": false,
+          "columns": [
+            "status",
+            "createdAt"
+          ],
+          "type": ""
+        },
+        "Job_recruiterId_idx": {
+          "name": "Job_recruiterId_idx",
+          "unique": false,
+          "columns": [
+            "recruiterId"
+          ],
+          "type": ""
+        },
+        "Job_companyId_idx": {
+          "name": "Job_companyId_idx",
+          "unique": false,
+          "columns": [
+            "companyId"
+          ],
+          "type": ""
+        },
+        "Job_locationPreference_idx": {
+          "name": "Job_locationPreference_idx",
+          "unique": false,
+          "columns": [
+            "locationPreference"
+          ],
+          "type": ""
+        },
+        "Job_employmentType_idx": {
+          "name": "Job_employmentType_idx",
+          "unique": false,
+          "columns": [
+            "employmentType"
+          ],
+          "type": ""
+        },
+        "Job_experienceLevel_idx": {
+          "name": "Job_experienceLevel_idx",
+          "unique": false,
+          "columns": [
+            "experienceLevel"
+          ],
+          "type": ""
+        },
+        "Job_deadline_idx": {
+          "name": "Job_deadline_idx",
+          "unique": false,
+          "columns": [
+            "deadline"
+          ],
+          "type": ""
+        },
+        "Job_status_locationPreference_experienceLevel_idx": {
+          "name": "Job_status_locationPreference_experienceLevel_idx",
+          "unique": false,
+          "columns": [
+            "status",
+            "locationPreference",
+            "experienceLevel"
+          ],
+          "type": ""
+        },
+        "Job_status_employmentType_experienceLevel_idx": {
+          "name": "Job_status_employmentType_experienceLevel_idx",
+          "unique": false,
+          "columns": [
+            "status",
+            "employmentType",
+            "experienceLevel"
+          ],
+          "type": ""
+        },
+        "Job_companyId_status_idx": {
+          "name": "Job_companyId_status_idx",
+          "unique": false,
+          "columns": [
+            "companyId",
+            "status"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "JobToRecruiterProfile": {
+          "type": "FOREIGN KEY",
+          "name": "JobToRecruiterProfile",
+          "columnNames": [
+            "recruiterId"
+          ],
+          "targetTableName": "RecruiterProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "CompanyToJob": {
+          "type": "FOREIGN KEY",
+          "name": "CompanyToJob",
+          "columnNames": [
+            "companyId"
+          ],
+          "targetTableName": "Company",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "Application": {
+      "name": "Application",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "devProfileId": {
+          "name": "devProfileId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "rejectionReason": {
+          "name": "rejectionReason",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "coverLetterId": {
+          "name": "coverLetterId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "resumeId": {
+          "name": "resumeId",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "STATUS",
+          "default": "PENDING",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "Application_pkey": {
+          "name": "Application_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "Application_jobId_idx": {
+          "name": "Application_jobId_idx",
+          "unique": false,
+          "columns": [
+            "jobId"
+          ],
+          "type": ""
+        },
+        "Application_devProfileId_idx": {
+          "name": "Application_devProfileId_idx",
+          "unique": false,
+          "columns": [
+            "devProfileId"
+          ],
+          "type": ""
+        },
+        "Application_status_idx": {
+          "name": "Application_status_idx",
+          "unique": false,
+          "columns": [
+            "status"
+          ],
+          "type": ""
+        },
+        "Application_jobId_status_idx": {
+          "name": "Application_jobId_status_idx",
+          "unique": false,
+          "columns": [
+            "jobId",
+            "status"
+          ],
+          "type": ""
+        },
+        "Application_devProfileId_status_idx": {
+          "name": "Application_devProfileId_status_idx",
+          "unique": false,
+          "columns": [
+            "devProfileId",
+            "status"
+          ],
+          "type": ""
+        },
+        "Application_createdAt_idx": {
+          "name": "Application_createdAt_idx",
+          "unique": false,
+          "columns": [
+            "createdAt"
+          ],
+          "type": ""
+        },
+        "Application_jobId_devProfileId_key": {
+          "name": "Application_jobId_devProfileId_key",
+          "unique": true,
+          "columns": [
+            "jobId",
+            "devProfileId"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "ApplicationToJob": {
+          "type": "FOREIGN KEY",
+          "name": "ApplicationToJob",
+          "columnNames": [
+            "jobId"
+          ],
+          "targetTableName": "Job",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "ApplicationToDeveloperProfile": {
+          "type": "FOREIGN KEY",
+          "name": "ApplicationToDeveloperProfile",
+          "columnNames": [
+            "devProfileId"
+          ],
+          "targetTableName": "DeveloperProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "AppResume": {
+          "type": "FOREIGN KEY",
+          "name": "AppResume",
+          "columnNames": [
+            "resumeId"
+          ],
+          "targetTableName": "File",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        },
+        "AppCoverLetter": {
+          "type": "FOREIGN KEY",
+          "name": "AppCoverLetter",
+          "columnNames": [
+            "coverLetterId"
+          ],
+          "targetTableName": "File",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "Notification": {
+      "name": "Notification",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "recipientId": {
+          "name": "recipientId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "actionType": {
+          "name": "actionType",
+          "type": "ActionType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "referenceType": {
+          "name": "referenceType",
+          "type": "ReferenceType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "referenceId": {
+          "name": "referenceId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "isRead": {
+          "name": "isRead",
+          "type": "boolean",
+          "default": false,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "Notification_pkey": {
+          "name": "Notification_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "Notification_recipientId_createdAt_idx": {
+          "name": "Notification_recipientId_createdAt_idx",
+          "unique": false,
+          "columns": [
+            "recipientId",
+            "createdAt"
+          ],
+          "type": ""
+        },
+        "Notification_recipientId_isRead_idx": {
+          "name": "Notification_recipientId_isRead_idx",
+          "unique": false,
+          "columns": [
+            "recipientId",
+            "isRead"
+          ],
+          "type": ""
+        },
+        "Notification_actionType_idx": {
+          "name": "Notification_actionType_idx",
+          "unique": false,
+          "columns": [
+            "actionType"
+          ],
+          "type": ""
+        },
+        "Notification_referenceId_idx": {
+          "name": "Notification_referenceId_idx",
+          "unique": false,
+          "columns": [
+            "referenceId"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "NotificationToUser": {
+          "type": "FOREIGN KEY",
+          "name": "NotificationToUser",
+          "columnNames": [
+            "recipientId"
+          ],
+          "targetTableName": "User",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "NO_ACTION"
+        }
+      }
+    },
+    "VerificationOtp": {
+      "name": "VerificationOtp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "otp": {
+          "name": "otp",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "type": {
+          "name": "type",
+          "type": "VerificationType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp(3)",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "VerificationOtp_pkey": {
+          "name": "VerificationOtp_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "VerificationOtp_email_type_idx": {
+          "name": "VerificationOtp_email_type_idx",
+          "unique": false,
+          "columns": [
+            "email",
+            "type"
+          ],
+          "type": ""
+        },
+        "VerificationOtp_expiresAt_idx": {
+          "name": "VerificationOtp_expiresAt_idx",
+          "unique": false,
+          "columns": [
+            "expiresAt"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    },
+    "EmailLog": {
+      "name": "EmailLog",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "status": {
+          "name": "status",
+          "type": "EmailLogStatus",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "type": {
+          "name": "type",
+          "type": "EmailType",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "errorMessage": {
+          "name": "errorMessage",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "EmailLog_pkey": {
+          "name": "EmailLog_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    },
+    "SavedJob": {
+      "name": "SavedJob",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "devProfileId": {
+          "name": "devProfileId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "default": "CURRENT_TIMESTAMP",
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "SavedJob_pkey": {
+          "name": "SavedJob_pkey",
+          "unique": true,
+          "columns": [
+            "id"
+          ],
+          "type": ""
+        },
+        "SavedJob_devProfileId_idx": {
+          "name": "SavedJob_devProfileId_idx",
+          "unique": false,
+          "columns": [
+            "devProfileId"
+          ],
+          "type": ""
+        },
+        "SavedJob_jobId_idx": {
+          "name": "SavedJob_jobId_idx",
+          "unique": false,
+          "columns": [
+            "jobId"
+          ],
+          "type": ""
+        },
+        "SavedJob_devProfileId_jobId_key": {
+          "name": "SavedJob_devProfileId_jobId_key",
+          "unique": true,
+          "columns": [
+            "devProfileId",
+            "jobId"
+          ],
+          "type": ""
+        }
+      },
+      "constraints": {
+        "PRIMARY_id": {
+          "type": "PRIMARY KEY",
+          "name": "PRIMARY_id",
+          "columnNames": [
+            "id"
+          ]
+        },
+        "DeveloperProfileToSavedJob": {
+          "type": "FOREIGN KEY",
+          "name": "DeveloperProfileToSavedJob",
+          "columnNames": [
+            "devProfileId"
+          ],
+          "targetTableName": "DeveloperProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "CASCADE"
+        },
+        "JobToSavedJob": {
+          "type": "FOREIGN KEY",
+          "name": "JobToSavedJob",
+          "columnNames": [
+            "jobId"
+          ],
+          "targetTableName": "Job",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "NO_ACTION",
+          "deleteConstraint": "CASCADE"
+        }
+      }
+    },
+    "_DeveloperProfileToSkill": {
+      "name": "_DeveloperProfileToSkill",
+      "constraints": {
+        "_DeveloperProfileToSkill_A_fkey": {
+          "type": "FOREIGN KEY",
+          "name": "_DeveloperProfileToSkill_A_fkey",
+          "columnNames": [
+            "A"
+          ],
+          "targetTableName": "DeveloperProfile",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "CASCADE",
+          "deleteConstraint": "CASCADE"
+        },
+        "_DeveloperProfileToSkill_B_fkey": {
+          "type": "FOREIGN KEY",
+          "name": "_DeveloperProfileToSkill_B_fkey",
+          "columnNames": [
+            "B"
+          ],
+          "targetTableName": "Skill",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "CASCADE",
+          "deleteConstraint": "CASCADE"
+        }
+      },
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "_DeveloperProfileToSkill_AB_pkey": {
+          "name": "_DeveloperProfileToSkill_AB_pkey",
+          "unique": true,
+          "columns": [
+            "A",
+            "B"
+          ],
+          "type": ""
+        },
+        "_DeveloperProfileToSkill_B_index": {
+          "name": "_DeveloperProfileToSkill_B_index",
+          "unique": false,
+          "columns": [
+            "B"
+          ],
+          "type": ""
+        }
+      }
+    },
+    "_JobToSkill": {
+      "name": "_JobToSkill",
+      "constraints": {
+        "_JobToSkill_A_fkey": {
+          "type": "FOREIGN KEY",
+          "name": "_JobToSkill_A_fkey",
+          "columnNames": [
+            "A"
+          ],
+          "targetTableName": "Job",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "CASCADE",
+          "deleteConstraint": "CASCADE"
+        },
+        "_JobToSkill_B_fkey": {
+          "type": "FOREIGN KEY",
+          "name": "_JobToSkill_B_fkey",
+          "columnNames": [
+            "B"
+          ],
+          "targetTableName": "Skill",
+          "targetColumnNames": [
+            "id"
+          ],
+          "updateConstraint": "CASCADE",
+          "deleteConstraint": "CASCADE"
+        }
+      },
+      "columns": {
+        "A": {
+          "name": "A",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        },
+        "B": {
+          "name": "B",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "comment": null,
+          "check": null
+        }
+      },
+      "comment": null,
+      "indexes": {
+        "_JobToSkill_AB_pkey": {
+          "name": "_JobToSkill_AB_pkey",
+          "unique": true,
+          "columns": [
+            "A",
+            "B"
+          ],
+          "type": ""
+        },
+        "_JobToSkill_B_index": {
+          "name": "_JobToSkill_B_index",
+          "unique": false,
+          "columns": [
+            "B"
+          ],
+          "type": ""
+        }
+      }
+    }
+  },
+  "enums": {
+    "ROLE": {
+      "name": "ROLE",
+      "values": [
+        "ADMIN",
+        "RECRUITER",
+        "DEVELOPER"
+      ],
+      "comment": null
+    },
+    "LOCATION": {
+      "name": "LOCATION",
+      "values": [
+        "REMOTE",
+        "ONSITE",
+        "HYBRID"
+      ],
+      "comment": null
+    },
+    "EmploymentType": {
+      "name": "EmploymentType",
+      "values": [
+        "FULLTIME",
+        "PARTTIME",
+        "CONTRACT",
+        "INTERN"
+      ],
+      "comment": null
+    },
+    "ExperienceLevel": {
+      "name": "ExperienceLevel",
+      "values": [
+        "BEGINNER",
+        "INTERMEDIATE",
+        "EXPERT"
+      ],
+      "comment": null
+    },
+    "STATUS": {
+      "name": "STATUS",
+      "values": [
+        "PENDING",
+        "REVIEW",
+        "ACCEPTED",
+        "REJECTED"
+      ],
+      "comment": null
+    },
+    "ActionType": {
+      "name": "ActionType",
+      "values": [
+        "JOB_CREATED",
+        "APPLICATION_SUBMITTED",
+        "APPLICATION_RECEIVED",
+        "APPLICATION_STATUS_CHANGED",
+        "EMPLOYMENT_CREATED",
+        "EMPLOYMENT_RESIGNED",
+        "EMPLOYMENT_TERMINATED",
+        "RECRUITER_INVITED",
+        "RECRUITER_JOINED",
+        "RECRUITER_RESIGNED",
+        "RECRUITER_TERMINATED",
+        "COMPANY_VERIFIED"
+      ],
+      "comment": null
+    },
+    "ReferenceType": {
+      "name": "ReferenceType",
+      "values": [
+        "JOB",
+        "APPLICATION",
+        "EMPLOYMENT",
+        "EMPLOYMENT_EVENT",
+        "RECRUITER_HISTORY",
+        "RECRUITER_EVENT",
+        "COMPANY",
+        "INVITE"
+      ],
+      "comment": null
+    },
+    "JobStatus": {
+      "name": "JobStatus",
+      "values": [
+        "DRAFT",
+        "ACTIVE",
+        "CLOSED",
+        "EXPIRED"
+      ],
+      "comment": null
+    },
+    "VerificationType": {
+      "name": "VerificationType",
+      "values": [
+        "EMAIL_VERIFICATION",
+        "PASSWORD_RESET"
+      ],
+      "comment": null
+    },
+    "EmailType": {
+      "name": "EmailType",
+      "values": [
+        "SEND_VERIFICATION_EMAIL",
+        "INVITATION_EMAIL",
+        "SEND_COMPANY_VERIFICATION_EMAIL",
+        "EMPLOYMENT_EVENT_EMAIL",
+        "APPLICATION_ACCEPTED_EMAIL",
+        "APPLICATION_REJECTED_EMAIL",
+        "COMPANY_JOIN_REQUEST_STATUS_EMAIL",
+        "RECRUITER_INVITE_STATUS_EMAIL"
+      ],
+      "comment": null
+    },
+    "SkillCategory": {
+      "name": "SkillCategory",
+      "values": [
+        "FRONTEND",
+        "BACKEND",
+        "DATABASE",
+        "DEVOPS",
+        "MOBILE",
+        "DESIGN",
+        "OTHER"
+      ],
+      "comment": null
+    },
+    "Industry": {
+      "name": "Industry",
+      "values": [
+        "TECHNOLOGY",
+        "FINANCE",
+        "HEALTHCARE",
+        "RETAIL",
+        "MANUFACTURING",
+        "TELECOMMUNICATIONS",
+        "REAL_ESTATE",
+        "LOGISTICS",
+        "EDUCATION",
+        "ENTERTAINMENT",
+        "ENERGY",
+        "CONSTRUCTION",
+        "CONSULTING",
+        "AGRICULTURE",
+        "GOVERNMENT"
+      ],
+      "comment": null
+    },
+    "Country": {
+      "name": "Country",
+      "values": [
+        "ARGENTINA",
+        "AUSTRALIA",
+        "AUSTRIA",
+        "BANGLADESH",
+        "BELGIUM",
+        "BRAZIL",
+        "CANADA",
+        "CHINA",
+        "DENMARK",
+        "EGYPT",
+        "FINLAND",
+        "FRANCE",
+        "GERMANY",
+        "GREECE",
+        "HONG_KONG",
+        "INDIA",
+        "INDONESIA",
+        "IRELAND",
+        "ITALY",
+        "JAPAN",
+        "MALAYSIA",
+        "MEXICO",
+        "NETHERLANDS",
+        "NEW_ZEALAND",
+        "NIGERIA",
+        "NORWAY",
+        "PAKISTAN",
+        "PHILIPPINES",
+        "POLAND",
+        "PORTUGAL",
+        "QATAR",
+        "RUSSIA",
+        "SAUDI_ARABIA",
+        "SINGAPORE",
+        "SOUTH_AFRICA",
+        "SOUTH_KOREA",
+        "SPAIN",
+        "SWEDEN",
+        "SWITZERLAND",
+        "TAIWAN",
+        "THAILAND",
+        "TURKEY",
+        "UKRAINE",
+        "UNITED_ARAB_EMIRATES",
+        "UNITED_KINGDOM",
+        "UNITED_STATES",
+        "VIETNAM"
+      ],
+      "comment": null
+    },
+    "Currency": {
+      "name": "Currency",
+      "values": [
+        "USD",
+        "EUR",
+        "PKR",
+        "INR",
+        "GBP",
+        "AED"
+      ],
+      "comment": null
+    },
+    "Type": {
+      "name": "Type",
+      "values": [
+        "RESIGN",
+        "TERMINATE"
+      ],
+      "comment": null
+    },
+    "EmailLogStatus": {
+      "name": "EmailLogStatus",
+      "values": [
+        "PENDING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "comment": null
+    },
+    "LeaveStatus": {
+      "name": "LeaveStatus",
+      "values": [
+        "PENDING",
+        "ACCEPTED",
+        "REJECTED"
+      ],
+      "comment": null
+    },
+    "InviteStatus": {
+      "name": "InviteStatus",
+      "values": [
+        "PENDING",
+        "ACCEPTED",
+        "REJECTED",
+        "EXPIRED"
+      ],
+      "comment": null
+    },
+    "FileStatus": {
+      "name": "FileStatus",
+      "values": [
+        "TEMP",
+        "PERMANENT"
+      ],
+      "comment": null
+    },
+    "FileType": {
+      "name": "FileType",
+      "values": [
+        "RESUME",
+        "COVER_LETTER",
+        "AVATAR"
+      ],
+      "comment": null
+    },
+    "CompanyJoinRequestStatus": {
+      "name": "CompanyJoinRequestStatus",
+      "values": [
+        "PENDING",
+        "ACCEPTED",
+        "REJECTED",
+        "CANCELLED"
+      ],
+      "comment": null
+    }
+  },
+  "extensions": {}
+}

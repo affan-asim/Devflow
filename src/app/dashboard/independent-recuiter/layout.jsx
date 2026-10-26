@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -141,70 +141,58 @@ function IndependentRecruiterSidebar({ open, onClose }) {
   );
 }
 
+import DashboardProtection from "@/components/auth/DashboardProtection";
+
 export default function IndependentRecruiterLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const router = useRouter();
-  const { user, isAuthenticated, isInitialized } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (!isInitialized) return;
-    if (!isAuthenticated) {
-      router.replace("/login");
-      return;
-    }
-    if (user?.role !== "RECRUITER") {
-      router.replace("/");
-      return;
-    }
-    if (user?.recruiterProfile?.companyId) {
-      router.replace("/dashboard/recruiter");
-    }
-  }, [isInitialized, isAuthenticated, user?.role, user?.recruiterProfile?.companyId, router]);
+  const { user } = useSelector((state) => state.auth);
 
   return (
-    <div className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
-      <IndependentRecruiterSidebar
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      />
+    <DashboardProtection allowedRole="RECRUITER" requireCompany={false}>
+      <div className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
+        <IndependentRecruiterSidebar
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+        />
 
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-30 border-b border-[var(--df-line)] bg-[var(--df-paper)]/95 backdrop-blur">
-          <div className="flex h-16 items-center justify-between px-5 sm:px-8 lg:px-10">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              className="flex h-9 w-9 items-center justify-center border border-[var(--df-line)] text-[var(--df-text)] lg:hidden"
-              aria-label="Open navigation"
-            >
-              <Menu size={17} />
-            </button>
-            <Link
-              href="/dashboard/independent-recruiter"
-              aria-label="Independent recruiter dashboard"
-              className="ml-3 lg:hidden"
-            >
-              <DevFlowLogo size="header" />
-            </Link>
-            <div className="hidden lg:block">
-              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--df-muted)]">
-                Independent recruiter workspace
-              </span>
-            </div>
-            <div className="ml-auto flex items-center gap-3">
-              <LogoutButton className="rounded-full border border-[var(--df-line)] px-3 py-2 hover:bg-[var(--df-paper-2)]" />
-              <div className="text-right">
-                <p className="text-xs font-medium">{user?.name || "Recruiter"}</p>
-                <p className="text-[9px] uppercase tracking-[0.14em] text-[var(--df-muted)]">Independent recruiter</p>
+        <div className="lg:pl-64">
+          <header className="sticky top-0 z-30 border-b border-[var(--df-line)] bg-[var(--df-paper)]/95 backdrop-blur">
+            <div className="flex h-16 items-center justify-between px-5 sm:px-8 lg:px-10">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="flex h-9 w-9 items-center justify-center border border-[var(--df-line)] text-[var(--df-text)] lg:hidden"
+                aria-label="Open navigation"
+              >
+                <Menu size={17} />
+              </button>
+              <Link
+                href="/dashboard/independent-recruiter"
+                aria-label="Independent recruiter dashboard"
+                className="ml-3 lg:hidden"
+              >
+                <DevFlowLogo size="header" />
+              </Link>
+              <div className="hidden lg:block">
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--df-muted)]">
+                  Independent recruiter workspace
+                </span>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center border border-[var(--df-line)] text-xs font-medium uppercase">
-                {user?.name?.charAt(0)?.toUpperCase() || "R"}
+              <div className="ml-auto flex items-center gap-3">
+                <LogoutButton className="rounded-full border border-[var(--df-line)] px-3 py-2 hover:bg-[var(--df-paper-2)]" />
+                <div className="text-right">
+                  <p className="text-xs font-medium">{user?.name || "Recruiter"}</p>
+                  <p className="text-[9px] uppercase tracking-[0.14em] text-[var(--df-muted)]">Independent recruiter</p>
+                </div>
+                <div className="flex h-9 w-9 items-center justify-center border border-[var(--df-line)] text-xs font-medium uppercase">
+                  {user?.name?.charAt(0)?.toUpperCase() || "R"}
+                </div>
               </div>
             </div>
-          </div>
-        </header>
-        <main className="min-h-[calc(100vh-64px)]">{children}</main>
+          </header>
+          <main className="min-h-[calc(100vh-64px)]">{children}</main>
+        </div>
       </div>
-    </div>
+    </DashboardProtection>
   );
 }

@@ -23,6 +23,7 @@ import {
 import {
   fetchJobs,
   deleteJob,
+  clearJobErrors,
 } from "@/lib/redux/slices/jobSlice";
 
 const PAGE_SIZE = 10;
@@ -122,6 +123,7 @@ export default function RecruiterJobsPage() {
     metadata = {},
     loadingList,
     errorList,
+    submitError,
   } = useSelector((state) => state.jobs);
 
   const [searchInput, setSearchInput] = useState("");
@@ -205,6 +207,7 @@ export default function RecruiterJobsPage() {
       ).unwrap();
 
       setDeleteTarget(null);
+      dispatch(clearJobErrors());
 
       if (jobs.length === 1 && page > 1) {
         setPage((current) => current - 1);
@@ -212,7 +215,7 @@ export default function RecruiterJobsPage() {
         loadJobs();
       }
     } catch {
-      // Redux slice owns the actual error.
+      // submitError is set in the Redux slice — shown inside the modal.
     } finally {
       setDeleting(false);
     }
@@ -519,9 +522,13 @@ export default function RecruiterJobsPage() {
         <DeleteModal
           job={deleteTarget}
           deleting={deleting}
-          onCancel={() =>
-            !deleting && setDeleteTarget(null)
-          }
+          error={submitError}
+          onCancel={() => {
+            if (!deleting) {
+              setDeleteTarget(null);
+              dispatch(clearJobErrors());
+            }
+          }}
           onConfirm={handleDelete}
         />
       )}
@@ -905,6 +912,7 @@ function JobsSkeleton() {
 function DeleteModal({
   job,
   deleting,
+  error,
   onCancel,
   onConfirm,
 }) {
@@ -927,7 +935,19 @@ function DeleteModal({
           undone.
         </p>
 
-        <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {error && (
+          <div className="mt-5 flex items-start gap-3 border border-red-200 bg-red-50 px-4 py-3">
+            <X
+              size={14}
+              className="mt-0.5 shrink-0 text-red-500"
+            />
+            <p className="text-xs leading-5 text-red-700">
+              {error}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             onClick={onCancel}
             disabled={deleting}

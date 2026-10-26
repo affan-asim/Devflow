@@ -784,7 +784,7 @@ export default function EmploymentHistoryDetailPage({
         ================================================== */}
 
         <Link
-          href="/dashboard/employment-history"
+          href="/dashboard/developer/employment-history"
           className="inline-flex items-center gap-2 text-xs font-medium text-[var(--df-muted)] transition hover:text-[var(--df-text)]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

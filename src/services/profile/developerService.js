@@ -11,6 +11,7 @@ import { storageQueue } from "@/lib/queues/s3";
 
 import prisma from "@/utils/prisma";
 import { getRecuiterProfile } from "./recuiterService";
+import { LOCATION } from "@/generated/prisma/client";
 const redis = new Redis();
 
 function mapYearsToExperienceLevels(years) {

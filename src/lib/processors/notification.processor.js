@@ -1,7 +1,5 @@
 import { createNotification } from "@/services/notifications/notificationService";
-import { PrismaClient } from "../../generated/prisma/client";
 
-import prisma from "@/utils/prisma";
 
 export async function processNotification(job) {
   try {

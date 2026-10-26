@@ -60,7 +60,7 @@ function StatusBadge({ status }) {
     },
     ACCEPTED: {
       Icon: CheckCircle2,
-      style: "border-lime-600/25 bg-lime-500/15 text-lime-800 dark:text-lime-300",
+      style: "border-green-600/25 bg-green-500/15 text-green-800 dark:text-green-400",
     },
     REJECTED: {
       Icon: XCircle,

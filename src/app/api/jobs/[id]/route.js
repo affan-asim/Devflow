@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
         const userId = req.headers.get('x-user-id');
         const userRole = req.headers.get('x-user-role');
         const { id } = await params;
-        const jobs = await getJob(id,userRole,userId);
+        const jobs = await getJob(id, userRole, userId);
 
         if (!jobs) {
             return NextResponse.json({
@@ -28,7 +28,7 @@ export async function GET(req, { params }) {
         console.error("GET JOB PROFILE ERROR:", error);
         if (error instanceof AppError) {
             return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
-          }
+        }
         return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -105,6 +105,9 @@ export async function DELETE(req, { params }) {
 
     } catch (error) {
         console.error("DELETE JOB PROFILE ERROR:", error);
+        if (error instanceof AppError) {
+            return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
+        }
         return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
     }
 }

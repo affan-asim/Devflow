@@ -15,109 +15,109 @@ redis.defineCommand("tokenBucket", {
     lua: luaSorce
 })
 
-export const fixedWindow = async (userId) => {
-    const windowSizeInSeconds = 60;
-    const maxReq = 5;
-    const currentWindow = Math.floor(Date.now() / (windowSizeInSeconds * 1000));
+// export const fixedWindow = async (userId) => {
+//     const windowSizeInSeconds = 60;
+//     const maxReq = 5;
+//     const currentWindow = Math.floor(Date.now() / (windowSizeInSeconds * 1000));
 
-    const key = `ratelimiter:${userId}:${currentWindow}`;
+//     const key = `ratelimiter:${userId}:${currentWindow}`;
 
-    const pipeline = redis.pipeline();
+//     const pipeline = redis.pipeline();
 
-    let res;
-    let error;
+//     let res;
+//     let error;
 
-    try {
-        res = await pipeline.incr(key).expire(key, windowSizeInSeconds, "NX").exec();
-    } catch (error) {
-        console.error("Redis error, bypassing rate limit:", error.message);
-        error = error;
-    }
+//     try {
+//         res = await pipeline.incr(key).expire(key, windowSizeInSeconds, "NX").exec();
+//     } catch (error) {
+//         console.error("Redis error, bypassing rate limit:", error.message);
+//         error = error;
+//     }
 
-    if (res[0][1] > maxReq && !error) {
-        // so this is basically a architecture desicion whether to process the request if redis is unavailble or completely drop the request
-        throw new AppError("Too many requests", 429);
-    }
+//     if (res[0][1] > maxReq && !error) {
+//         // so this is basically a architecture desicion whether to process the request if redis is unavailble or completely drop the request
+//         throw new AppError("Too many requests", 429);
+//     }
 
-    // Do some processing or db queries etc... then
+//     // Do some processing or db queries etc... then
 
-    return {
-        message: "Data is updated successfully!"
-    }
-};
+//     return {
+//         message: "Data is updated successfully!"
+//     }
+// };
 
-export const slidingWindow = async (userId) => {
-    const key = `ratelimiter:log:${userId}`;
-    const windowSizeInSeconds = 60;
-    const currentTime = Date.now()
-    const cleanBeforeWindow = currentTime / (windowSizeInSeconds * 1000);
-    const maxReq = 5;
+// export const slidingWindow = async (userId) => {
+//     const key = `ratelimiter:log:${userId}`;
+//     const windowSizeInSeconds = 60;
+//     const currentTime = Date.now()
+//     const cleanBeforeWindow = currentTime / (windowSizeInSeconds * 1000);
+//     const maxReq = 5;
 
-    const pipeline = redis.pipeline();
-    let res;
-    let error;
+//     const pipeline = redis.pipeline();
+//     let res;
+//     let error;
 
-    try {
-        pipeline.zremrangebyscore(key, 0, cleanBeforeWindow)
-        pipeline.zadd(key, currentTime, `${currentTime}${Math.random()}`)
-        pipeline.zcard(key)
-        pipeline.expire(key, 60, "NX")
+//     try {
+//         pipeline.zremrangebyscore(key, 0, cleanBeforeWindow)
+//         pipeline.zadd(key, currentTime, `${currentTime}${Math.random()}`)
+//         pipeline.zcard(key)
+//         pipeline.expire(key, 60, "NX")
 
-        res = await pipeline.exec();
-    } catch (error) {
-        console.error("Redis error, bypassing rate limit:", error.message);
-        error = error;
-    }
+//         res = await pipeline.exec();
+//     } catch (error) {
+//         console.error("Redis error, bypassing rate limit:", error.message);
+//         error = error;
+//     }
 
-    const requests = res?.[2]?.[1] || 0;
+//     const requests = res?.[2]?.[1] || 0;
 
-    if (requests > maxReq && !error) {
-        throw new AppError("Too many requests", 429)
-    }
+//     if (requests > maxReq && !error) {
+//         throw new AppError("Too many requests", 429)
+//     }
 
-    return {
-        message: "Data is updated successfully!"
-    }
-}
+//     return {
+//         message: "Data is updated successfully!"
+//     }
+// }
 
-export const slidingWindowCounter = async (userId) => {
-    const windowSizeInSeconds = 60;
-    const maxReq = 5;
-    const now = Date.now();
-    const currentWindowId = Math.floor(now / (windowSizeInSeconds * 1000));
-    const previousWindowId = currentWindowId - 1;
-    const currentCount = `ratelimiter:counter:${userId}:${currentWindowId}`;
-    const previousCount = `ratelimiter:counter:${userId}:${previousWindowId}`;
+// export const slidingWindowCounter = async (userId) => {
+//     const windowSizeInSeconds = 60;
+//     const maxReq = 5;
+//     const now = Date.now();
+//     const currentWindowId = Math.floor(now / (windowSizeInSeconds * 1000));
+//     const previousWindowId = currentWindowId - 1;
+//     const currentCount = `ratelimiter:counter:${userId}:${currentWindowId}`;
+//     const previousCount = `ratelimiter:counter:${userId}:${previousWindowId}`;
 
-    const timePassedInCurrentWindow = now % 60000;
-    const weightOfPreviousWindow = (60000 - timePassedInCurrentWindow) / 60000;
+//     const timePassedInCurrentWindow = now % 60000;
+//     const weightOfPreviousWindow = (60000 - timePassedInCurrentWindow) / 60000;
 
-    const pipeline = redis.pipeline();
-    let res;
-    let redisError;
+//     const pipeline = redis.pipeline();
+//     let res;
+//     let redisError;
 
-    try {
-        pipeline.get(currentCount)
-        pipeline.get(previousCount)
+//     try {
+//         pipeline.get(currentCount)
+//         pipeline.get(previousCount)
 
-        res = await pipeline.exec();
-    } catch (error) {
-        console.error("Redis error, bypassing rate limit:", error.message);
-        redisError = error;
-    }
+//         res = await pipeline.exec();
+//     } catch (error) {
+//         console.error("Redis error, bypassing rate limit:", error.message);
+//         redisError = error;
+//     }
 
-    const estimatedRequests = parseInt(res?.[0]?.[1] || "0", 10) + (parseInt(res?.[1]?.[1] || "0", 10) * weightOfPreviousWindow);
+//     const estimatedRequests = parseInt(res?.[0]?.[1] || "0", 10) + (parseInt(res?.[1]?.[1] || "0", 10) * weightOfPreviousWindow);
 
-    if (!redisError && estimatedRequests >= maxReq) {
-        throw new AppError("Too many requests", 429)
-    }
+//     if (!redisError && estimatedRequests >= maxReq) {
+//         throw new AppError("Too many requests", 429)
+//     }
 
-    await redis.pipeline().incr(currentCount).expire(currentCount, 120, "NX").exec();
+//     await redis.pipeline().incr(currentCount).expire(currentCount, 120, "NX").exec();
 
-    return {
-        message: "Data is updated successfully!"
-    }
-}
+//     return {
+//         message: "Data is updated successfully!"
+//     }
+// }
 
 // export const tokenBucket = async (userId) => {
 //     const bucketSize = 10;
@@ -172,8 +172,8 @@ export const tokenBucket = async (id) => {
 // bucket capacity, leak per sec, 
 
 
-export const leakyBucket = async () => {
-    const now = Date.now();
-    const interval = 500;
+// export const leakyBucket = async () => {
+//     const now = Date.now();
+//     const interval = 500;
 
-}
+// }

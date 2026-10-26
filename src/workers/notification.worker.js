@@ -26,4 +26,17 @@ worker.on("failed", (job, error) => {
     `Notification job ${job?.id} failed`,
     error
   );
+
+    if (job.attemptsMade >= job.opts.attempts) {
+    console.error(`ALERT: Job ${job.id} exhausted all retries!`);
+  }
 });
+
+const shutdown = async (signal) => {
+  console.log(`Received ${signal}, closing worker gracefully...`);
+  await worker.close();
+  process.exit(0);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

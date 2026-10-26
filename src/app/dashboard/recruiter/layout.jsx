@@ -1,7 +1,12 @@
 "use client";
 
 import RecruiterDashboardShell from "@/components/recruiter-dashboard/layout/RecruiterDashboardShell";
+import DashboardProtection from "@/components/auth/DashboardProtection";
 
 export default function RecruiterLayout({ children }) {
-  return <RecruiterDashboardShell>{children}</RecruiterDashboardShell>;
+  return (
+    <DashboardProtection allowedRole="RECRUITER" requireCompany={true}>
+      <RecruiterDashboardShell>{children}</RecruiterDashboardShell>
+    </DashboardProtection>
+  );
 }

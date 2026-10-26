@@ -70,7 +70,7 @@ function getEventRecruiter(event) {
 function StatusBadge({ status }) {
   const styles = {
     PENDING: "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-    ACCEPTED: "border-lime-600/25 bg-lime-500/15 text-lime-800 dark:text-lime-300",
+    ACCEPTED: "border-green-600/25 bg-green-500/15 text-green-800 dark:text-green-400",
     REJECTED: "border-red-500/25 bg-red-500/10 text-red-700 dark:text-red-300",
   };
 

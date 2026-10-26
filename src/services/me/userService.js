@@ -4,8 +4,7 @@ import Redis from "ioredis";
 import { otpKey, userKey } from "@/utils/redisKeyNames";
 import { ROLE } from "@/generated/prisma";
 
-// import prisma from "@/utils/prisma";
-const prisma = new PrismaClient()
+import prisma from "@/utils/prisma";
 import { redis } from "@/lib/redis";
 
 export async function getUser(userId) {
@@ -29,7 +28,7 @@ export async function getUser(userId) {
     include: {
       developerProfile: {
         select: {
-          id: true
+          id: true,
         }
       },
       recruiterProfile: {
@@ -300,5 +299,8 @@ export const updateUserStatus = async (adminId, targetUserId, isActive) => {
     },
   });
 
+  await redis.del(`${userKey}:${targetUserId}`);
+
   return updatedUser;
+  
 };

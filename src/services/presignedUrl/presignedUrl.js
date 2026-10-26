@@ -322,6 +322,37 @@ export const getFileUrl = async (currentUserId, currentUserRole, key) => {
     hasAccess = Boolean(application);
   }
 
+  // A company owner must also be able to view the profile resume of a recruiter
+  // who sent an invite or a join-request to their company.
+  // The resume is linked via RecruiterProfile.resumeId — we look up which
+  // recruiter owns it, then verify the current user's company is involved.
+  if (!hasAccess && isRecruiter && file.type === "RESUME" && recruiterProfile) {
+    const ownerRecruiter = await prisma.recruiterProfile.findUnique({
+      where: { resumeId: file.id },
+      select: { id: true },
+    });
+
+    if (ownerRecruiter) {
+      const [invite, joinRequest] = await Promise.all([
+        prisma.recruiterInvite.findFirst({
+          where: {
+            invitedByRecruiterId: ownerRecruiter.id,
+            company: { ownerId: recruiterProfile.id },
+          },
+          select: { id: true },
+        }),
+        prisma.companyJoinRequest.findFirst({
+          where: {
+            recruiterId: ownerRecruiter.id,
+            company: { ownerId: recruiterProfile.id },
+          },
+          select: { id: true },
+        }),
+      ]);
+      hasAccess = Boolean(invite || joinRequest);
+    }
+  }
+
   if (!hasAccess && isRecruiter && file.type === "COVER_LETTER") {
     if (recruiterProfile) {
       const [application, recruiterEvent, employmentEvent] = await Promise.all([

@@ -326,7 +326,7 @@ export default function ApplicationDetailPage() {
                 )}
 
                 <Link
-                  href={`/jobs/developer/${job.id}`}
+                  href={`/dashboard/developer/jobs/${job.id}`}
                   className="group mt-6 flex h-11 items-center justify-between bg-[var(--df-text)] px-4 text-xs font-medium text-[var(--df-paper)] hover:opacity-90"
                 >
                   <span>View job</span>

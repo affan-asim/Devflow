@@ -5,8 +5,7 @@ import { recruiterProfileKey } from "@/utils/redisKeyNames";
 import { storageQueue } from "@/lib/queues/s3";
 import { checkTempKey } from "@/services/presignedUrl/presignedUrl";
 
-// import prisma from "@/utils/prisma";
-const prisma = new PrismaClient()
+import prisma from "@/utils/prisma";
 
 const RECRUITER_PROFILE_SORT_FIELDS = new Set([
     "createdAt",

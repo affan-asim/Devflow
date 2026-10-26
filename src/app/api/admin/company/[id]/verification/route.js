@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { ROLE } from "@/generated/prisma";
 import { AppError } from "@/utils/AppError";
-import { verifyCompanySchema } from "@/validations/adminCompany";
 import { updateCompanyVerification } from "@/services/company/companyService";
+import { verifyCompanySchema } from "@/validations/company";
 
 export async function PATCH(req, { params }) {
   try {

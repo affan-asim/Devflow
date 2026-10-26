@@ -35,6 +35,57 @@ const INDUSTRIES = [
   { value: "OTHER", label: "Other" },
 ];
 
+const COUNTRIES = [
+  { value: "", label: "All countries" },
+  { value: "ARGENTINA", label: "Argentina" },
+  { value: "AUSTRALIA", label: "Australia" },
+  { value: "AUSTRIA", label: "Austria" },
+  { value: "BANGLADESH", label: "Bangladesh" },
+  { value: "BELGIUM", label: "Belgium" },
+  { value: "BRAZIL", label: "Brazil" },
+  { value: "CANADA", label: "Canada" },
+  { value: "CHINA", label: "China" },
+  { value: "DENMARK", label: "Denmark" },
+  { value: "EGYPT", label: "Egypt" },
+  { value: "FINLAND", label: "Finland" },
+  { value: "FRANCE", label: "France" },
+  { value: "GERMANY", label: "Germany" },
+  { value: "GREECE", label: "Greece" },
+  { value: "HONG_KONG", label: "Hong Kong" },
+  { value: "INDIA", label: "India" },
+  { value: "INDONESIA", label: "Indonesia" },
+  { value: "IRELAND", label: "Ireland" },
+  { value: "ITALY", label: "Italy" },
+  { value: "JAPAN", label: "Japan" },
+  { value: "MALAYSIA", label: "Malaysia" },
+  { value: "MEXICO", label: "Mexico" },
+  { value: "NETHERLANDS", label: "Netherlands" },
+  { value: "NEW_ZEALAND", label: "New Zealand" },
+  { value: "NIGERIA", label: "Nigeria" },
+  { value: "NORWAY", label: "Norway" },
+  { value: "PAKISTAN", label: "Pakistan" },
+  { value: "PHILIPPINES", label: "Philippines" },
+  { value: "POLAND", label: "Poland" },
+  { value: "PORTUGAL", label: "Portugal" },
+  { value: "QATAR", label: "Qatar" },
+  { value: "RUSSIA", label: "Russia" },
+  { value: "SAUDI_ARABIA", label: "Saudi Arabia" },
+  { value: "SINGAPORE", label: "Singapore" },
+  { value: "SOUTH_AFRICA", label: "South Africa" },
+  { value: "SOUTH_KOREA", label: "South Korea" },
+  { value: "SPAIN", label: "Spain" },
+  { value: "SWEDEN", label: "Sweden" },
+  { value: "SWITZERLAND", label: "Switzerland" },
+  { value: "TAIWAN", label: "Taiwan" },
+  { value: "THAILAND", label: "Thailand" },
+  { value: "TURKEY", label: "Turkey" },
+  { value: "UKRAINE", label: "Ukraine" },
+  { value: "UNITED_ARAB_EMIRATES", label: "United Arab Emirates" },
+  { value: "UNITED_KINGDOM", label: "United Kingdom" },
+  { value: "UNITED_STATES", label: "United States" },
+  { value: "VIETNAM", label: "Vietnam" },
+];
+
 const SORT_OPTIONS = [
   { value: "desc", label: "Newest first" },
   { value: "asc", label: "Oldest first" },
@@ -589,23 +640,17 @@ export default function IndependentRecruiterCompaniesPage() {
                 options={INDUSTRIES}
               />
 
-              <label className="block">
-                <span className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--df-muted)]">
-                  Country
-                </span>
-
-                <input
-                  value={urlCountry}
-                  onChange={(event) =>
-                    updateParams({
-                      country: event.target.value,
-                      page: 1,
-                    })
-                  }
-                  placeholder="e.g. Pakistan"
-                  className="h-10 w-full border border-[var(--df-line)] bg-[var(--df-paper)] px-3 text-[11px] outline-none placeholder:text-[var(--df-muted)] focus:border-[var(--df-text)]"
-                />
-              </label>
+              <FilterSelect
+                label="Country"
+                value={urlCountry}
+                onChange={(value) =>
+                  updateParams({
+                    country: value,
+                    page: 1,
+                  })
+                }
+                options={COUNTRIES}
+              />
 
               <FilterSelect
                 label="Sort"

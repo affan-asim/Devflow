@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import { publicKey } from "./utils/redisKeyNames";
 import { tokenBucket } from "./services/rateLimiter/rateLimiter";
 
 const PUBLIC_ROUTES = [
@@ -21,7 +20,7 @@ const PUBLIC_APIS = [
     '/api/auth/resend-otp'
 ];
 
-const JWT_SECRET = new TextEncoder().encode(process.env.SECRET_KEY || 'your-secret-key');
+const JWT_SECRET = new TextEncoder().encode(process.env.SECRET_KEY || '1bb3c3fbc8c6a9332a08bca99dda8ddb9ad58cab8f045420b3abef9555bb1fbd');
 
 export async function proxy(req) {
     try {
@@ -34,7 +33,9 @@ export async function proxy(req) {
             pathname === '/api/profile/recruiter/general' ||
             /^\/api\/profile\/recruiter\/general\/[^/]+$/.test(pathname)
         );
-        const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || (isApiRoute && (PUBLIC_APIS.includes(pathname) || isRecruiterDirectoryApi));
+
+        const normalizedPath = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+        const isPublicRoute = PUBLIC_ROUTES.includes(normalizedPath) | (isApiRoute && (PUBLIC_APIS.includes(pathname) || isRecruiterDirectoryApi));
         const isPublicApi = isApiRoute && (PUBLIC_APIS.includes(pathname) || isRecruiterDirectoryApi);
         let decoded = null;
         // let ip = req.ip;
@@ -55,30 +56,34 @@ export async function proxy(req) {
         }
 
         if (!decoded && refreshToken && pathname !== '/api/auth/refresh') {
-            const refreshResponse = await fetch(`${req.nextUrl.origin}/api/auth/refresh`, {
-                headers: { 'Cookie': `refresh-token=${refreshToken}` },
-                method: "POST"
-            });
-
-            if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
-                const { payload } = await jwtVerify(data.accessToken, JWT_SECRET);
-                decoded = payload;
-
-                const res = NextResponse.next({
-                    request: {
-                        headers: new Headers({
-                            ...Object.fromEntries(req.headers.entries()),
-                            'x-user-id': decoded.userId.toString(),
-                            'x-user-role': decoded.role,
-                        })
-                    }
+            try {
+                const refreshResponse = await fetch(`${req.nextUrl.origin}/api/auth/refresh`, {
+                    headers: { 'Cookie': `refresh-token=${refreshToken}` },
+                    method: "POST"
                 });
 
-                const cookies = refreshResponse.headers.getSetCookie();
-                cookies.forEach((cookie) => res.headers.append('set-cookie', cookie));
+                if (refreshResponse.ok) {
+                    const data = await refreshResponse.json();
+                    const { payload } = await jwtVerify(data.accessToken, JWT_SECRET);
+                    decoded = payload;
 
-                return res;
+                    const res = NextResponse.next({
+                        request: {
+                            headers: new Headers({
+                                ...Object.fromEntries(req.headers.entries()),
+                                'x-user-id': decoded.userId.toString(),
+                                'x-user-role': decoded.role,
+                            })
+                        }
+                    });
+
+                    const cookies = refreshResponse.headers.getSetCookie();
+                    cookies.forEach((cookie) => res.headers.append('set-cookie', cookie));
+
+                    return res;
+                }
+            } catch (refreshError) {
+                console.log("Token refresh failed:", refreshError.message);
             }
         }
 

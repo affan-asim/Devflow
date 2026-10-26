@@ -34,8 +34,8 @@ export const updateDeveloperProfileSchema = developerProfile
 export const recuiterProfile = z.object({
   yearsOfExp: z.number().optional(),
   bio: z.string().min(1, 'Bio must be at least 10 characters long').max(500).optional(),
-  githubUrl: z.url('Invalid GitHub URL').optional().or(z.literal('')),
-  portfolioUrl: z.url('Invalid Portfolio Url URL').optional().or(z.literal('')),
+  githubUrl: z.url('Invalid GitHub URL').nullable().or(z.literal('')),
+  portfolioUrl: z.url('Invalid Portfolio Url URL').nullable().or(z.literal('')),
   locationPreference: z.enum(['REMOTE', 'ONSITE', 'HYBRID'], {
     error: () => ({ message: 'Invalid location preference' })
   }),

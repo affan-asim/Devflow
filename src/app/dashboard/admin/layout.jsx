@@ -53,6 +53,8 @@ const navigation = [
   },
 ];
 
+import DashboardProtection from "@/components/auth/DashboardProtection";
+
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -65,18 +67,19 @@ export default function AdminLayout({ children }) {
 
   const sidebarWidth = collapsed ? "lg:w-[84px]" : "lg:w-[248px]";
 
-  return (<div className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
-    {mobileOpen && (
-      <button
-        type="button"
-        aria-label="Close navigation"
-        onClick={() => setMobileOpen(false)}
-        className="fixed inset-0 z-40 bg-black/35 lg:hidden"
-      />
-    )}
+  return (
+    <DashboardProtection allowedRole="ADMIN">
+      <div className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
+        {mobileOpen && (
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={() => setMobileOpen(false)}
+            className="fixed inset-0 z-40 bg-black/35 lg:hidden"
+          />
+        )}
 
-    ```
-    <aside
+        <aside
       className={`fixed inset-y-0 left-0 z-50 flex w-[270px] flex-col border-r border-[var(--df-line)] bg-[var(--df-paper)] transition-all duration-300 lg:translate-x-0 ${sidebarWidth} ${mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
     >
@@ -220,6 +223,6 @@ export default function AdminLayout({ children }) {
       <main className="df-container py-8 sm:py-10">{children}</main>
     </div>
   </div>
-
+    </DashboardProtection>
   );
 }

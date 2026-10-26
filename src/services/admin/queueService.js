@@ -42,11 +42,15 @@ export const getFailedJobsByQueue = async (queueName, page = 1, limit = 20) => {
     id: job.id,
     name: job.name,
     data: job.data,
+    opts: job.opts,
     failedReason: job.failedReason,
     stacktrace: job.stacktrace,
     attemptsMade: job.attemptsMade,
+    maxAttempts: job.opts?.attempts || 3,
     timestamp: job.timestamp,
+    processedOn: job.processedOn,
     finishedOn: job.finishedOn,
+    delay: job.delay,
   }));
 
   return {
@@ -57,5 +61,59 @@ export const getFailedJobsByQueue = async (queueName, page = 1, limit = 20) => {
       limit: parsedLimit,
       totalPages: Math.ceil(totalFailed / parsedLimit),
     },
+  };
+};
+
+export const retryFailedJob = async (queueName, jobId) => {
+  const targetQueue = QUEUE_MAP[queueName?.toLowerCase()];
+
+  if (!targetQueue) {
+    throw new AppError(`Queue '${queueName}' not found. Valid queues are: email, notification, storage`, 404);
+  }
+
+  const job = await targetQueue.getJob(jobId);
+
+  if (!job) {
+    throw new AppError(`Job '${jobId}' not found in queue '${queueName}'`, 404);
+  }
+
+  const state = await job.getState();
+  if (state !== "failed") {
+    throw new AppError(`Job '${jobId}' cannot be retried because its status is '${state}', not 'failed'`, 400);
+  }
+
+  await job.retry();
+
+  return {
+    jobId: job.id,
+    name: job.name,
+    status: "retried",
+  };
+};
+
+export const retryAllFailedJobs = async (queueName, limit = 100) => {
+  const targetQueue = QUEUE_MAP[queueName.toLowerCase()];
+
+  if (!targetQueue) {
+    throw new AppError(`Queue '${queueName}' not found. Valid queues are: email, notification, storage`, 404);
+  }
+
+  const parsedLimit = Math.max(1, Math.min(500, parseInt(limit, 10) || 100));
+  const failedCount = await targetQueue.getFailedCount();
+
+  if (failedCount === 0) {
+    return {
+      queue: queueName,
+      retriedCount: 0,
+      totalFailed: 0,
+    };
+  }
+
+  const retriedJobs = await targetQueue.retryJobs({ count: parsedLimit });
+
+  return {
+    queue: queueName,
+    retriedCount: retriedJobs.length || Math.min(failedCount, parsedLimit),
+    totalFailedRemaining: Math.max(0, failedCount - (retriedJobs.length || Math.min(failedCount, parsedLimit))),
   };
 };

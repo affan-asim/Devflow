@@ -1,7 +1,6 @@
 import { promoteTempFileToPermanent } from "@/services/presignedUrl/presignedUrl";
 import { PrismaClient } from "@/generated/prisma/client";
-import { s3 } from "@/utils/s3";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { supabaseAdmin } from "@/utils/supabaseAdmin";
 import { redis } from "@/lib/redis";
 import { recruiterProfileKey } from "@/utils/redisKeyNames";
 
@@ -11,19 +10,32 @@ export async function processStorage(job) {
 
   if (job.name === "delete-storage-file") {
     const bucketName = process.env.S3_BUCKET_NAME;
+    const { fileKey, fileId } = job.data;
 
-    try {
-      await s3.send(
-        new DeleteObjectCommand({
-          Bucket: bucketName,
-          Key: job.data.fileKey,
-        })
-      );
-    } catch (error) {
-      throw new Error("Error in deleting file from object storage:", error)
+    if (!fileKey) {
+      console.warn(`[Storage Worker] delete-storage-file job ${job.id} missing fileKey. Skipping.`);
+      return;
     }
 
-    console.log("File is deleted from object storage")
+    try {
+      const { error } = await supabaseAdmin.storage
+        .from(bucketName)
+        .remove([fileKey]);
+
+      if (error) throw error;
+      console.log(`[Storage Worker] File ${fileKey} deleted via Supabase storage.`);
+    } catch (error) {
+      console.error(`[Storage Worker] Supabase deletion failed for key ${fileKey}:`, error);
+      throw new Error(`Error deleting file ${fileKey} from storage: ${error.message}`);
+    }
+
+    if (fileId) {
+      await prisma.file.deleteMany({
+        where: { id: fileId },
+      }).catch((dbErr) => {
+        console.warn(`[Storage Worker] File record ${fileId} could not be removed:`, dbErr.message);
+      });
+    }
   }
   else {
     const { tempKey, userId, fileType, model, applicationId, developerProfileId, recruiterProfileId } = job.data;

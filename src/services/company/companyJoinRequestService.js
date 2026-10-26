@@ -3,6 +3,8 @@ import { AppError } from "@/utils/AppError";
 import { getRecuiterProfile } from "@/services/profile/recuiterService";
 import { emailQueue } from "@/lib/queues/email.queue";
 import crypto from "crypto";
+import { redis } from "@/lib/redis";
+import { userKey } from "@/utils/redisKeyNames";
 
 const requestInclude = {
   company: { select: { id: true, name: true, logo: true, industry: true, country: true, isVerified: true, websiteUrl: true } },
@@ -146,15 +148,26 @@ export const updateCompanyJoinRequestStatus = async (userId, id, data) => {
     return { id };
   });
 
+  if (status === "ACCEPTED") {
+    // Invalidate the recruiter's cached /api/auth/me response so their
+    // updated companyId is reflected immediately on the next request.
+    try {
+      await redis.del(`${userKey}:${request.recruiter.user.id}`);
+    } catch (cacheError) {
+      console.error("Failed to invalidate user cache after join request accept:", cacheError);
+    }
+  }
+
   try {
+    const id = crypto.randomUUID();
     await emailQueue.add("company-join-request-status-email", {
       email: request.recruiter.user.email,
       recruiterName: request.recruiter.user.name,
       companyName: request.company.name,
       status,
       roleTitle: status === "ACCEPTED" ? data.roleTitle : undefined,
-      uuid: crypto.randomUUID(),
-    });
+      uuid: id,
+    },{ jobId: id });
   } catch (error) {
     console.error("FAILED TO QUEUE COMPANY JOIN REQUEST EMAIL:", error);
   }

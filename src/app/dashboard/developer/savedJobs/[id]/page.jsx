@@ -122,7 +122,7 @@ export default function SavedJobDetailPage({ params }) {
       <main className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
           <Link
-            href="/dashboard/developer/saved-jobs"
+            href="/dashboard/developer/savedJobs"
             className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--df-muted)] hover:text-[var(--df-text)]"
           >
             ← Saved jobs
@@ -141,7 +141,7 @@ export default function SavedJobDetailPage({ params }) {
       <main className="min-h-screen bg-[var(--df-paper)] text-[var(--df-text)]">
         <div className="mx-auto max-w-3xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
           <Link
-            href="/dashboard/developer/saved-jobs"
+            href="/dashboard/developer/savedJobs"
             className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--df-muted)]"
           >
             ← Saved jobs
@@ -162,7 +162,7 @@ export default function SavedJobDetailPage({ params }) {
             </p>
 
             <Link
-              href="/dashboard/developer/saved-jobs"
+              href="/dashboard/developer/savedJobs"
               className="mt-7 inline-flex h-10 items-center border border-[var(--df-text)] bg-[var(--df-text)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-white"
             >
               Back to saved jobs
@@ -192,7 +192,7 @@ export default function SavedJobDetailPage({ params }) {
 
         {/* Back */}
         <Link
-          href="/dashboard/developer/saved-jobs"
+          href="/dashboard/developer/savedJobs"
           className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--df-muted)] transition-colors hover:text-[var(--df-text)]"
         >
           ← Saved jobs

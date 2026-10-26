@@ -2,10 +2,9 @@ import { PrismaClient } from "@/generated/prisma/client";
 import { AppError } from "@/utils/AppError";
 import { getRecuiterProfile } from "../profile/recuiterService";
 import { cacheInvalidate, getCacheKey } from "@/utils/helper";
-import { companyDetail, companyList, recruiterProfileKey } from "@/utils/redisKeyNames";
+import { companyDetail, companyList, recruiterProfileKey, userKey } from "@/utils/redisKeyNames";
 import Redis from "ioredis";
-// import prisma from "@/utils/prisma";
-const prisma = new PrismaClient()
+import prisma from "@/utils/prisma";
 const redis = new Redis();
 
 
@@ -176,7 +175,7 @@ export const getCompanies = async (searchParams, searchParamsObject) => {
     const [comapanies, totalCount] = await prisma.$transaction([
         prisma.company.findMany({
             where,
-            select:{
+            select: {
                 country: true,
                 createdAt: true,
                 id: true,
@@ -306,6 +305,7 @@ export const createCompany = async (userId, data) => {
         };
     })
 
+    await redis.del(`${userKey}:${userId}`);
     await redis.del(`${recruiterProfileKey}:${userId}`);
 
     await cacheInvalidate(companyList)
@@ -416,9 +416,12 @@ export const updateCompanyVerification = async (companyId, isVerified) => {
         data: { isVerified },
     });
 
-    const uuid = crypto.randomUUID();
+    await cacheInvalidate(companyList)
+    await redis.del(`${companyDetail}:${company.id}`);
+    await redis.del(`${companyDetail}:admin:${company.id}`);
 
     try {
+        const uuid = crypto.randomUUID();
         await notificationQueue.add("send-notification-event", {
             recipientId: company.owner.user.id,
             actionType: ActionType.COMPANY_VERIFIED,
@@ -435,7 +438,7 @@ export const updateCompanyVerification = async (companyId, isVerified) => {
             companyName: company.name,
             isVerified,
             uuid
-        });
+        }, { jobId: uuid });
     } catch (queueError) {
         console.error("FAILED TO ENQUEUE VERIFICATION JOBS:", queueError);
     }

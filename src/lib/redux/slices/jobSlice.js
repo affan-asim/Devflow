@@ -16,7 +16,7 @@ export const fetchJobs = createAsyncThunk(
       return response.data; // Expects { success: true, data: { jobs: [], metadata: {} } }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch jobs"
+        error.response?.data?.error || error.message || error|| "Failed to fetch jobs"
       );
     }
   }
@@ -30,7 +30,7 @@ export const fetchJobById = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch job details"
+        error.response?.data?.error || error.message || error|| "Failed to fetch job details"
       );
     }
   }
@@ -62,8 +62,9 @@ export const createJob = createAsyncThunk(
       const response = await api.post("/api/jobs", jobData);
       return response.data;
     } catch (error) {
+      console.log(error)
       return rejectWithValue(
-        error.response?.data?.error || "Failed to create job posting"
+        error.response?.data?.error || error.message || error || "Failed to create job posting"
       );
     }
   }
@@ -76,7 +77,7 @@ export const updateJob = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update job posting"
+        error.response?.data?.error || error.message || error || "Failed to update job posting"
       );
     }
   }
@@ -93,7 +94,7 @@ export const updateJobStatus = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update job status"
+        error.response?.data?.error || error.message || error || "Failed to update job status"
       );
     }
   }
@@ -110,7 +111,7 @@ export const deleteJob = createAsyncThunk(
       return { id: jobId, data: response.data };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to delete job"
+        error.response?.data?.error || error.message || error|| "Failed to delete job"
       );
     }
   }
@@ -127,7 +128,7 @@ export const updateJobFeaturedStatus = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to update featured status"
+        error.response?.data?.error || error.message || error|| "Failed to update featured status"
       );
     }
   }
@@ -144,7 +145,7 @@ export const deleteJobByAdmin = createAsyncThunk(
       return { id: jobId, data: response.data };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to delete job by admin"
+        error.response?.data?.error || error.message || error|| "Failed to delete job by admin"
       );
     }
   }
@@ -162,7 +163,7 @@ export const fetchAdminJobs = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch admin jobs"
+        error.response?.data?.error || error.message || error|| "Failed to fetch admin jobs"
       );
     }
   }

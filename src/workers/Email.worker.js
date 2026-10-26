@@ -8,10 +8,10 @@ const worker = new Worker(
   processEmail,
   {
     connection: connectionOptions,
-    concurrency: 1,
+    concurrency: 5,
     limiter: {
-        duration: 10000,
-        max: 9
+        duration: 1000,
+        max: 2
     },
     
   }
@@ -31,8 +31,21 @@ worker.on("completed", (job) => {
 
 worker.on("failed", (job, error) => {
   console.error(`Email job ${job?.id} failed`, error);
+    if (job.attemptsMade >= job.opts.attempts) {
+    console.error(`ALERT: Job ${job.id} exhausted all retries!`);
+    // Send to Sentry, Discord/Slack webhook, or DLQ table
+  }
 });
 
 worker.on("error", (err) => {
   console.error("Worker Redis Connection Error:", err);
 });
+
+const shutdown = async (signal) => {
+  console.log(`Received ${signal}, closing worker gracefully...`);
+  await worker.close();
+  process.exit(0);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

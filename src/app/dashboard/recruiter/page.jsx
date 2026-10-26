@@ -229,7 +229,7 @@ export default function RecruiterDashboardPage() {
 
             {company?.id && (
               <Link
-                href={`/dashboard/recruiter/company/${company.id}`}
+                href={`/dashboard/recruiter/company`}
                 className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--df-text)] transition-opacity hover:opacity-60"
               >
                 View company

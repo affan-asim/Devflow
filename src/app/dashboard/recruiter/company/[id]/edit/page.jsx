@@ -22,6 +22,15 @@ import {
   clearCurrentCompany,
   clearCompanyErrors,
 } from "@/lib/redux/slices/companySlice";
+import { Country } from "@/generated/prisma/client";
+
+const COUNTRIES = Object.values(Country).map((c) => ({
+  value: c,
+  label: c
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase()),
+})).sort((a, b) => a.label.localeCompare(b.label));
 
 const INDUSTRIES = [
   "Software",
@@ -90,19 +99,30 @@ function SelectField({
     <div>
       <FieldLabel required={required}>{label}</FieldLabel>
 
-      <select
-        value={value}
-        onChange={onChange}
-        className="h-11 w-full appearance-none border border-[var(--df-line)] bg-[var(--df-paper)] px-3.5 text-sm text-[var(--df-text)] outline-none transition focus:border-[var(--df-text)]"
-      >
-        <option value="">{placeholder}</option>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={onChange}
+          className="h-11 w-full appearance-none border border-[var(--df-line)] bg-[var(--df-paper)] px-3.5 pr-8 text-sm text-[var(--df-text)] outline-none transition focus:border-[var(--df-text)] cursor-pointer"
+        >
+          <option value="">{placeholder}</option>
 
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+          {options.map((option) => {
+            const val = typeof option === "object" ? option.value : option;
+            const lbl = typeof option === "object" ? option.label : option;
+            return (
+              <option key={val} value={val}>
+                {lbl}
+              </option>
+            );
+          })}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--df-muted)]">
+          <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }
@@ -554,11 +574,12 @@ export default function EditCompanyPage() {
                     placeholder="Select industry"
                   />
 
-                  <InputField
+                  <SelectField
                     label="Country"
                     value={form.country}
                     onChange={handleChange("country")}
-                    placeholder="e.g. Pakistan"
+                    options={COUNTRIES}
+                    placeholder="Select country"
                   />
                 </div>
               </section>
@@ -612,7 +633,7 @@ export default function EditCompanyPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      router.push(`/dashboard/company/${companyId}`)
+                      router.push(`/dashboard/recruiter/company`)
                     }
                     disabled={submitting}
                     className="inline-flex h-11 items-center justify-center border border-[var(--df-line)] px-5 text-xs font-semibold uppercase tracking-[0.1em] transition hover:border-[var(--df-text)] disabled:cursor-not-allowed disabled:opacity-50"
@@ -687,7 +708,9 @@ export default function EditCompanyPage() {
                       {form.country && (
                         <div className="flex items-center gap-2 text-xs text-[var(--df-muted)]">
                           <MapPin size={14} />
-                          <span>{form.country}</span>
+                          <span>
+                            {COUNTRIES.find((c) => c.value === form.country)?.label || form.country}
+                          </span>
                         </div>
                       )}
 

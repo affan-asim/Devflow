@@ -28,6 +28,7 @@ import {
   deleteJob,
   fetchJobById,
   updateJobStatus,
+  clearJobErrors,
 } from "@/lib/redux/slices/jobSlice";
 
 function formatDate(date) {
@@ -115,6 +116,7 @@ export default function RecruiterJobDetailPage() {
     currentJob,
     loadingDetail,
     errorDetail,
+    submitError,
   } = useSelector((state) => state.jobs);
 
   const [showDelete, setShowDelete] =
@@ -169,6 +171,7 @@ export default function RecruiterJobDetailPage() {
         "/dashboard/recruiter/jobs"
       );
     } catch {
+      // submitError is set in the Redux slice — shown inside the modal.
       setDeleting(false);
     }
   };
@@ -674,10 +677,13 @@ export default function RecruiterJobDetailPage() {
         <DeleteModal
           job={job}
           deleting={deleting}
-          onCancel={() =>
-            !deleting &&
-            setShowDelete(false)
-          }
+          error={submitError}
+          onCancel={() => {
+            if (!deleting) {
+              setShowDelete(false);
+              dispatch(clearJobErrors());
+            }
+          }}
           onConfirm={handleDelete}
         />
       )}
@@ -869,6 +875,7 @@ function StatusModal({
 function DeleteModal({
   job,
   deleting,
+  error,
   onCancel,
   onConfirm,
 }) {
@@ -891,7 +898,19 @@ function DeleteModal({
           undone.
         </p>
 
-        <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {error && (
+          <div className="mt-5 flex items-start gap-3 border border-red-200 bg-red-50 px-4 py-3">
+            <X
+              size={15}
+              className="mt-0.5 shrink-0 text-red-500"
+            />
+            <p className="text-xs leading-5 text-red-700">
+              {error}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             onClick={onCancel}
             disabled={deleting}

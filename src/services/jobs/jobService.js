@@ -141,6 +141,7 @@ export const createJob = async (userId, data) => {
   });
 
   await cacheInvalidate(jobList);
+  await cacheInvalidate(`${jobList}:recruiter-dashboard`)
   const id = crypto.randomUUID();
 
   try {
@@ -264,6 +265,8 @@ export const getJobs = async (searchParams, searchParamsObject, userId, role, in
     searchParamsObject
   );
   let cachedData = null;
+
+  console.log(cacheKey)
 
   try {
     const rawData = await redis.get(cacheKey);
@@ -413,6 +416,7 @@ export const updateJob = async (id, data, userId) => {
 
   await redis.del(`${jobDetail}:${job.id}`);
   await cacheInvalidate(jobList)
+  await cacheInvalidate(`${jobList}:recruiter-dashboard`)
 
   return job;
 };
@@ -657,14 +661,25 @@ export const deleteJob = async (id, userId, isAdmin) => {
     throw new AppError("Connot delete other company job!", 400)
   }
 
+  const applications = await prisma.application.findMany({
+    where: {
+      jobId: id,
+    },
+  });
+
+  if (applications.length > 0) {
+    throw new AppError("Job has applicants, Cannot delete this job!", 400);
+  } 
+
   const job = await prisma.job.delete({
     where: {
       id
     }
   });
 
-  await redis.del(`${jobDetail}:${job.id}`);
   await cacheInvalidate(jobList)
+  await cacheInvalidate(`${jobList}:recruiter-dashboard`)
+  await redis.del(`${jobDetail}:${job.id}`);
 
   return job;
 }
@@ -717,6 +732,7 @@ export const updateJobStatus = async (id, data, userId) => {
 
   await redis.del(`${jobDetail}:${job.id}`);
   await cacheInvalidate(jobList)
+  await cacheInvalidate(`${jobList}:recruiter-dashboard`)
 
   return job;
 }
@@ -738,6 +754,8 @@ export const updateJobFeaturedStatus = async (jobId, isFeatured) => {
     data: { isFeatured },
   });
 
+  await cacheInvalidate(jobList)
+  await cacheInvalidate(`${jobList}:recruiter-dashboard`)
   await invalidateAdminJobCaches(jobId);
 
   return updatedJob;
@@ -750,6 +768,16 @@ export const deleteJobByAdmin = async (jobId) => {
   });
 
   if (!existingJob) throw new AppError("Job not found", 404);
+
+  const applicants = await prisma.application.findMany({
+    where: {
+      jobId,
+    },
+  });
+
+  if (applicants.length > 0) {
+    throw new AppError("Job cannot be deleted as it has applicants", 400);
+  } 
 
   await prisma.job.delete({ where: { id: jobId } });
 

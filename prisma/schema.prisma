@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD-schema.svg"
+}
+
 enum ROLE {
   ADMIN
   RECRUITER

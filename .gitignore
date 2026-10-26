@@ -41,3 +41,22 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+
+# files
+A.md
+a2.md
+prompt.txt
+presentation-scripts.md
+MERMAID_DIAGRAM.md
+presentation-demo.md
+
+repomix-output.xml

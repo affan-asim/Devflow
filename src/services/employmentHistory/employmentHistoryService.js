@@ -4,8 +4,8 @@ import { getRecuiterProfile } from "../profile/recuiterService";
 import { getDeveloperProfile } from "../profile/developerService";
 import { developerProfileKey } from "@/utils/redisKeyNames";
 import { redis } from "@/lib/redis";
+import prisma from "@/utils/prisma";
 
-const prisma = new PrismaClient()
 
 export const getEmploymentHistoryList = async (searchParams, userId) => {
     const employmentType = searchParams.get("employmentType");
@@ -49,7 +49,9 @@ export const getEmploymentHistoryList = async (searchParams, userId) => {
         ]
     }
 
-    let orderBy;
+    let orderBy = {
+        createdAt: "desc"
+    };
 
     if (sort) {
         if (sort === "salary") {
@@ -108,7 +110,7 @@ export const getEmploymentHistoryList = async (searchParams, userId) => {
                         }
                     }
                 }
-            }
+            },
         }),
         prisma.employmentHistory.count({
             where

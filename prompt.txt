@@ -1,0 +1,147 @@
+Task: Verify and Refine My DevFlow Presentation Script
+I am preparing a technical meeting with an experienced software engineering team executive. I have finalized a system architecture diagram and need speaking notes for only two parts of my presentation:
+1. Opening introduction.
+2. System architecture explanation.
+Inspect the actual DevFlow repository and verify the technical claims in my supplied architecture diagram and draft script. Do not modify application code.
+Requirements
+- Write a natural opening of approximately 45–60 seconds.
+- Write a spoken architecture explanation of approximately 3–4 minutes.
+- Use straightforward professional English that a developer can deliver comfortably without sounding as though they are reading documentation.
+- Assume the audience understands software engineering, so emphasize implementation choices, interactions, responsibilities, and trade-offs instead of explaining basic technology definitions.
+- Follow the actual diagram from client/frontend through request handling, backend logic, data infrastructure, workers, external services, and admin operations.
+- Verify the real responsibilities of src/proxy.js, authentication and authorization checks, Zod validation, service logic, Prisma/PostgreSQL, Redis, BullMQ workers, Resend, and Supabase Storage.
+- Verify the direct-upload path and administrative monitoring operations.
+- Check the accuracy of descriptions of token refresh, rate limiting, worker/database interactions, and background jobs.
+- Identify material implementation issues that could make a presentation claim misleading, including any known hardcoded email recipient, weak JWT-secret fallback, or rate-limiter failure behaviour.
+- Distinguish verified implementation from assumptions, limitations, and future improvements.
+- Do not claim the application is fully secure, production-ready, or comprehensively tested unless supported by evidence.
+- Keep the two scripts focused; do not write scripts for the ERD, authentication diagrams, or live application walkthrough yet.
+Required output
+A. Opening script.
+B. System architecture script, with clear natural transitions.
+C. Brief presenter cues indicating which diagram section to point at while speaking.
+D. A short list of statements I should correct or verify before the meeting.
+Do not invent achievements, test results, or implementation details. Do not modify files or expose secrets.
+At a high level, DevFlow is organized into several layers, each with a different responsibility.
+Starting from the client side, the application uses the Next.js App Router for the interface, with Redux Toolkit for client-side state management and Axios for HTTP requests. The interface covers the public marketplace as well as the developer, recruiter, and admin experiences.
+When a request reaches the server, it passes through the Next.js Proxy. In my implementation, the proxy is responsible for JWT verification, refresh-token handling, Redis-backed rate limiting, and forwarding identity information derived from the verified token.
+One important distinction is that the proxy does not replace authorization checks in the backend. The API route handlers apply the relevant role checks, and the input is validated where required. The service layer then handles the actual business operations, including the applicable ownership and business-rule checks.
+For data persistence, I'm using Prisma with PostgreSQL. PostgreSQL stores the main relational data, such as users, companies, jobs, applications, and their associated records. Prisma provides the data-access layer that the application uses to interact with that database.
+Redis has several responsibilities in this system. It's used for caching, OTP-related operations, and rate limiting. It also supports BullMQ, which I use to process certain tasks asynchronously.
+The background workers run separately from the request-handling path. For example, the email worker sends messages through Resend and records email logs. The notification worker handles notification records, the storage worker processes storage-related tasks using Supabase Storage, and the job-expiration worker runs a scheduled task to update expired jobs.
+This separation allows the application to handle work outside the immediate HTTP request where appropriate. It also introduces additional responsibilities, such as monitoring queues, handling failed jobs, and understanding what happens when Redis or a worker becomes unavailable.
+The diagram also includes the administrative operations. Beyond the regular user-facing features, the admin area provides analytics, dashboard metrics, system-health information, email-log visibility, and queue operations such as inspecting or retrying failed jobs.
+There's also a direct upload path to Supabase Storage using a signed URL, where implemented. This lets the browser transfer file data directly to the storage service rather than sending the entire file through the application server.
+One important trade-off in this architecture is that Redis supports several different capabilities. This keeps the infrastructure relatively simple, but it also means those capabilities share a dependency and must be considered together when planning failure handling and reliability.
+Overall, the main idea is to separate the user interface, request handling, business logic, data persistence, and background processing while keeping their interactions explicit. I'll now move to the database diagram to show how I modelled the business domain and the relationships behind these features.
+
+Daigram:
+```mermaid
+flowchart TB
+
+    subgraph CLIENT["1. Client and Frontend"]
+        direction LR
+        UI["Next.js App Router UI<br/>Public · Developer · Recruiter · Admin"]
+        CLIENT_STATE["Redux Toolkit + Axios<br/>Client State · HTTP Requests"]
+        UI --> CLIENT_STATE
+    end
+
+    subgraph ENTRY["2. Request Entry and Security"]
+        direction LR
+        PROXY["Next.js Proxy  proxy.js<br/>JWT verify · refresh rotation<br/>Redis rate limiting · identity headers"]
+        API["Next.js API Route Handlers"]
+        PROXY -->|"x-user-id / x-user-role"| API
+    end
+
+    subgraph BACKEND["3. Backend Application Logic"]
+        direction LR
+        AUTHZ["Authorization<br/>Per-route role + ownership checks"]
+        VALIDATION["Zod Input Validation"]
+        SERVICES["Service Layer<br/>Business rules and operations"]
+        AUTHZ --> VALIDATION --> SERVICES
+    end
+
+    subgraph DATA["4. Data and Infrastructure"]
+        direction LR
+        PRISMA["Prisma ORM"]
+        PG[("PostgreSQL")]
+        REDIS[("Redis<br/>Cache · OTP · Rate limiting<br/>BullMQ queue infrastructure")]
+        PRISMA --> PG
+    end
+
+    subgraph WORKERS["5. Background Processing (separate worker process, BullMQ)"]
+        direction LR
+        EMAIL["Email Worker<br/>→ Resend · writes EmailLog"]
+        NOTIF["Notification Worker<br/>→ writes Notification"]
+        STORAGE["Storage Worker<br/>→ Supabase · updates File / Application / Profile"]
+        EXPIRY["Job Expiration Worker<br/>→ updates Job status (daily cron)"]
+    end
+
+    subgraph EXTERNAL["6. External Services"]
+        direction LR
+        MAIL["Resend<br/>Email provider"]
+        OBJECT_STORAGE["Supabase Storage<br/>Object storage"]
+    end
+
+    subgraph ADMIN["7. Admin Monitoring (read-only consumers of platform data)"]
+        direction LR
+        ADM_DASH["Dashboard Metrics<br/>Prisma counts, Redis cached"]
+        ADM_ANALYTICS["Analytics<br/>Users · Jobs · Applications · Companies"]
+        ADM_JOBS["Job Management<br/>Featured · delete"]
+        ADM_LOGS["Email Logs<br/>Send history audit"]
+        ADM_QUEUES["Queue Ops<br/>Counts · failed jobs · retry"]
+        ADM_HEALTH["System Health<br/>DB · Redis · queues · storage"]
+    end
+
+    %% Request path
+    CLIENT_STATE -->|"HTTPS requests"| PROXY
+    PROXY -->|"rate limit check"| REDIS
+    API --> AUTHZ
+
+    %% Direct upload path (bypasses API server)
+    CLIENT_STATE -.->|"direct upload via presigned URL"| OBJECT_STORAGE
+
+    %% Services to data
+    SERVICES -->|"database operations"| PRISMA
+    SERVICES -->|"cache / OTP / enqueue jobs"| REDIS
+
+    %% Queue consumption
+    REDIS -->|"queued jobs"| EMAIL
+    REDIS -->|"queued jobs"| NOTIF
+    REDIS -->|"queued jobs"| STORAGE
+    REDIS -->|"queued jobs"| EXPIRY
+
+    %% Worker outputs
+    EMAIL --> MAIL
+    STORAGE --> OBJECT_STORAGE
+    EMAIL -->|"writes EmailLog"| PRISMA
+    NOTIF -->|"writes Notification"| PRISMA
+    STORAGE -->|"updates File / Application / Profile"| PRISMA
+    EXPIRY -->|"updates Job.status"| PRISMA
+
+    %% Admin features read from data tier
+    ADM_DASH -->|"cached reads"| REDIS
+    ADM_DASH --> PRISMA
+    ADM_ANALYTICS --> PRISMA
+    ADM_JOBS --> PRISMA
+    ADM_LOGS --> PRISMA
+    ADM_QUEUES -->|"inspect / retry"| REDIS
+    ADM_HEALTH -.->|"health checks"| PRISMA
+    ADM_HEALTH -.->|"health checks"| REDIS
+    ADM_HEALTH -.->|"health checks"| OBJECT_STORAGE
+
+    classDef client fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef entry fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    classDef backend fill:#ffedd5,stroke:#ea580c,color:#7c2d12
+    classDef data fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef workers fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+    classDef external fill:#cffafe,stroke:#0891b2,color:#164e63
+    classDef admin fill:#fef9c3,stroke:#ca8a04,color:#713f12
+
+    class UI,CLIENT_STATE client
+    class PROXY,API entry
+    class AUTHZ,VALIDATION,SERVICES backend
+    class PRISMA,PG,REDIS data
+    class EMAIL,NOTIF,STORAGE,EXPIRY workers
+    class MAIL,OBJECT_STORAGE external
+    class ADM_DASH,ADM_QUEUES,ADM_HEALTH,ADM_LOGS,ADM_ANALYTICS,ADM_JOBS admin

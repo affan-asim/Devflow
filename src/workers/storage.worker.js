@@ -32,8 +32,20 @@ worker.on("completed", (job) => {
 
 worker.on("failed", (job, error) => {
   console.error(`Storage job ${job?.id} failed`, error);
+    if (job.attemptsMade >= job.opts.attempts) {
+    console.error(`ALERT: Job ${job.id} exhausted all retries!`);
+  }
 });
 
 worker.on("error", (err) => {
   console.error("Worker Redis Connection Error:", err);
 });
+
+const shutdown = async (signal) => {
+  console.log(`Received ${signal}, closing worker gracefully...`);
+  await worker.close();
+  process.exit(0);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

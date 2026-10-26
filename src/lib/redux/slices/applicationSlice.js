@@ -17,7 +17,7 @@ export const createApplication = createAsyncThunk(
     } catch (error) {
       console.log(error);
       return rejectWithValue(
-        error.response?.data?.error || error.message || "Failed to submit application"
+        error.response?.data?.error || error.message || error || "Failed to submit application"
       );
     }
   }

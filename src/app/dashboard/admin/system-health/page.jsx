@@ -1,25 +1,31 @@
-
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Activity,
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   CircleHelp,
   Clock3,
   Cloud,
   Database,
+  ExternalLink,
   HardDrive,
   LoaderCircle,
+  Play,
   RefreshCw,
+  RotateCcw,
   Server,
   ShieldCheck,
   Wifi,
+  X,
   XCircle,
   Zap,
 } from "lucide-react";
+import api from "@/lib/api/axios";
 
 import {
   fetchAdminHealthMetrics,
@@ -141,10 +147,281 @@ function ServiceCard({
   );
 }
 
-function QueueCard({ title, queue }) {
+function FailedJobsModal({ queueName, isOpen, onClose, onJobRetried }) {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [expandedJobId, setExpandedJobId] = useState(null);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [retryingId, setRetryingId] = useState(null);
+
+  const fetchFailedJobs = useCallback(async () => {
+    if (!queueName) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get(`/api/admin/system/queues/${queueName}/failed?limit=50`);
+      setJobs(res.data?.data || []);
+    } catch (err) {
+      setError(typeof err === "string" ? err : err?.message || "Failed to load jobs");
+    } finally {
+      setLoading(false);
+    }
+  }, [queueName]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchFailedJobs();
+      setSuccessMessage(null);
+      setError(null);
+    }
+  }, [isOpen, fetchFailedJobs]);
+
+  const handleRetrySingle = async (jobId) => {
+    setRetryingId(jobId);
+    setError(null);
+    setSuccessMessage(null);
+    try {
+      await api.post(`/api/admin/system/queues/${queueName}`, { jobId });
+      setSuccessMessage(`Job ${jobId} successfully re-queued for processing!`);
+      await fetchFailedJobs();
+      if (onJobRetried) onJobRetried();
+    } catch (err) {
+      setError(typeof err === "string" ? err : err?.message || "Failed to retry job");
+    } finally {
+      setRetryingId(null);
+    }
+  };
+
+  const handleRetryAll = async () => {
+    if (!confirm(`Are you sure you want to retry all failed jobs in the '${queueName}' queue?`)) {
+      return;
+    }
+    setActionLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+    try {
+      const res = await api.post(`/api/admin/system/queues/${queueName}`, { count: 100 });
+      setSuccessMessage(res.data?.message || "All failed jobs re-queued!");
+      await fetchFailedJobs();
+      if (onJobRetried) onJobRetried();
+    } catch (err) {
+      setError(typeof err === "string" ? err : err?.message || "Failed to retry jobs");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden border border-[var(--df-line)] bg-[var(--df-paper)] shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[var(--df-line)] bg-[var(--df-paper)] px-6 py-5">
+          <div>
+            <p className="df-eyebrow">Queue Operations / Failures</p>
+            <h3 className="mt-1 text-xl font-semibold tracking-[-0.03em] text-[var(--df-text)] capitalize">
+              {queueName} queue &mdash; Failed jobs
+            </h3>
+            <p className="mt-1 text-xs text-[var(--df-muted)]">
+              Inspect failure stack traces, raw job payloads, and trigger retries.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRetryAll}
+              disabled={actionLoading || loading || jobs.length === 0}
+              className="df-btn df-btn-accent !min-h-9 !px-4 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RotateCcw size={13} className={actionLoading ? "animate-spin" : ""} />
+              Retry all ({jobs.length})
+            </button>
+            <button
+              onClick={onClose}
+              className="flex h-9 w-9 items-center justify-center border border-[var(--df-line)] text-[var(--df-muted)] transition-colors hover:border-[var(--df-text)] hover:text-[var(--df-text)]"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Alerts */}
+        {error && (
+          <div className="mx-6 mt-4 flex items-center gap-2 border border-rose-200 bg-rose-50/70 p-3.5 text-xs text-rose-800">
+            <AlertTriangle size={14} className="shrink-0 text-rose-700" />
+            <span>{error}</span>
+          </div>
+        )}
+        {successMessage && (
+          <div className="mx-6 mt-4 flex items-center gap-2 border border-emerald-200 bg-emerald-50/70 p-3.5 text-xs text-emerald-800">
+            <CheckCircle2 size={14} className="shrink-0 text-emerald-700" />
+            <span>{successMessage}</span>
+          </div>
+        )}
+
+        {/* Content list */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-3">
+          {loading ? (
+            <div className="py-16 text-center text-xs text-[var(--df-muted)]">
+              <LoaderCircle className="mx-auto mb-3 animate-spin text-[var(--df-text)]" size={24} />
+              Loading failed jobs...
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="border border-dashed border-[var(--df-line)] bg-white/40 py-16 text-center">
+              <CheckCircle2 className="mx-auto mb-2 text-emerald-700" size={28} />
+              <p className="text-sm font-semibold text-[var(--df-text)]">No failed jobs recorded</p>
+              <p className="mt-1 text-xs text-[var(--df-muted)]">
+                All background jobs for this queue processed successfully or have been resolved.
+              </p>
+            </div>
+          ) : (
+            jobs.map((job) => {
+              const isExpanded = expandedJobId === job.id;
+              const isRetrying = retryingId === job.id;
+
+              return (
+                <div
+                  key={job.id}
+                  className="border border-[var(--df-line)] bg-[rgba(255,255,255,0.4)] p-4 transition-colors hover:bg-[rgba(255,255,255,0.7)]"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div
+                      className="cursor-pointer flex-1"
+                      onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        {isExpanded ? (
+                          <ChevronDown size={14} className="text-[var(--df-muted)]" />
+                        ) : (
+                          <ChevronRight size={14} className="text-[var(--df-muted)]" />
+                        )}
+                        <span className="font-mono text-xs font-semibold text-[var(--df-text)]">
+                          {job.name || "Unnamed job"}
+                        </span>
+                        <span className="border border-[var(--df-line)] bg-[var(--df-paper)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--df-muted)]">
+                          ID: {job.id}
+                        </span>
+                        <span className="border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-800">
+                          {job.attemptsMade} attempts
+                        </span>
+                      </div>
+
+                      <p className="mt-2 text-xs font-medium text-rose-700">
+                        {job.failedReason || "Failure reason not specified"}
+                      </p>
+                      <p className="mt-1 text-[11px] text-[var(--df-muted)]">
+                        Failed at: {formatTime(job.finishedOn || job.timestamp)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleRetrySingle(job.id)}
+                        disabled={isRetrying || actionLoading}
+                        className="df-btn df-btn-outline !min-h-8 !px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Play size={11} className={isRetrying ? "animate-spin" : ""} />
+                        {isRetrying ? "Retrying..." : "Retry job"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded JSON Inspector */}
+                  {isExpanded && (
+                    <div className="mt-4 space-y-3 border-t border-[var(--df-line)] pt-3 text-xs">
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 border border-[var(--df-line)] bg-[var(--df-paper)] p-3 text-[11px]">
+                        <div>
+                          <span className="block font-semibold uppercase text-[9px] tracking-wider text-[var(--df-muted)]">
+                            Created
+                          </span>
+                          <span className="mt-0.5 block font-mono text-[var(--df-text)]">{formatTime(job.timestamp)}</span>
+                        </div>
+                        <div>
+                          <span className="block font-semibold uppercase text-[9px] tracking-wider text-[var(--df-muted)]">
+                            Processed
+                          </span>
+                          <span className="mt-0.5 block font-mono text-[var(--df-text)]">{formatTime(job.processedOn)}</span>
+                        </div>
+                        <div>
+                          <span className="block font-semibold uppercase text-[9px] tracking-wider text-[var(--df-muted)]">
+                            Finished
+                          </span>
+                          <span className="mt-0.5 block font-mono text-[var(--df-text)]">{formatTime(job.finishedOn)}</span>
+                        </div>
+                        <div>
+                          <span className="block font-semibold uppercase text-[9px] tracking-wider text-[var(--df-muted)]">
+                            Attempts / Max
+                          </span>
+                          <span className="mt-0.5 block font-mono text-[var(--df-text)]">
+                            {job.attemptsMade} / {job.maxAttempts}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <span className="text-[11px] font-semibold text-[var(--df-muted)] uppercase tracking-wider">
+                          Job Data Payload:
+                        </span>
+                        <pre className="mt-1.5 max-h-44 overflow-auto border border-[var(--df-line)] bg-stone-900 p-3 font-mono text-[11px] leading-relaxed text-emerald-400">
+                          {JSON.stringify(job.data, null, 2)}
+                        </pre>
+                      </div>
+
+                      {job.opts && (
+                        <div>
+                          <span className="text-[11px] font-semibold text-[var(--df-muted)] uppercase tracking-wider">
+                            Job Options:
+                          </span>
+                          <pre className="mt-1.5 max-h-36 overflow-auto border border-[var(--df-line)] bg-stone-900 p-3 font-mono text-[11px] leading-relaxed text-sky-300">
+                            {JSON.stringify(job.opts, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
+                      {job.stacktrace && job.stacktrace.length > 0 && (
+                        <div>
+                          <span className="text-[11px] font-semibold text-[var(--df-muted)] uppercase tracking-wider">
+                            Error Stacktrace:
+                          </span>
+                          <pre className="mt-1.5 max-h-44 overflow-auto border border-[var(--df-line)] bg-stone-900 p-3 font-mono text-[11px] leading-relaxed text-rose-300">
+                            {job.stacktrace.join("\n")}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-[var(--df-line)] bg-[var(--df-paper)] px-6 py-4">
+          <span className="text-xs text-[var(--df-muted)]">
+            Showing up to 50 latest failures
+          </span>
+          <button
+            onClick={onClose}
+            className="df-btn df-btn-outline !min-h-9 !px-4 text-xs font-semibold"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QueueCard({ queueKey, title, queue, onInspectFailed }) {
   const counts = queue?.counts;
   const connected = queue?.connected === true;
   const failed = queue?.connected === false;
+  const failedJobsCount = counts?.failed || 0;
+
   const entries = [
     ["Waiting", counts?.waiting],
     ["Active", counts?.active],
@@ -155,46 +432,67 @@ function QueueCard({ title, queue }) {
   ];
 
   return (
-    <article className="rounded-xl border border-[var(--df-line)] bg-[var(--df-paper)] p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold text-[var(--df-text)]">{title}</h3>
-          <p className="mt-1 text-xs text-[var(--df-muted)]">
-            Background job processing
-          </p>
+    <article className="border border-[var(--df-line)] bg-[rgba(255,255,255,0.24)] p-5 sm:p-6 flex flex-col justify-between transition-colors hover:bg-[rgba(255,255,255,0.48)]">
+      <div>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="df-eyebrow">Queue</p>
+            <h3 className="mt-1 font-semibold text-[var(--df-text)]">{title}</h3>
+            <p className="mt-1 text-xs text-[var(--df-muted)]">
+              Background job processing
+            </p>
+          </div>
+          <StatusPill
+            status={connected ? "healthy" : failed ? "failed" : "unknown"}
+          >
+            {connected ? "Reachable" : failed ? "Unavailable" : "Unknown"}
+          </StatusPill>
         </div>
-        <StatusPill
-          status={connected ? "healthy" : failed ? "failed" : "unknown"}
-        >
-          {connected ? "Reachable" : failed ? "Unavailable" : "Unknown"}
-        </StatusPill>
+
+        {counts ? (
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {entries.map(([label, value]) => (
+              <Metric
+                key={label}
+                label={label}
+                value={typeof value === "number" ? value.toLocaleString() : "—"}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 border border-[var(--df-line)] bg-stone-50 p-4 text-xs text-[var(--df-muted)]">
+            {queue?.error || "Queue metrics are not available."}
+          </div>
+        )}
+
+        {queue?.error && counts && (
+          <p className="mt-3 text-xs text-rose-700">{queue.error}</p>
+        )}
       </div>
 
-      {counts ? (
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {entries.map(([label, value]) => (
-            <Metric
-              key={label}
-              label={label}
-              value={typeof value === "number" ? value.toLocaleString() : "—"}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-5 rounded-lg bg-stone-50 p-4 text-sm text-[var(--df-muted)]">
-          {queue?.error || "Queue metrics are not available."}
-        </div>
-      )}
-
-      {queue?.error && counts && (
-        <p className="mt-3 text-xs text-rose-700">{queue.error}</p>
-      )}
+      <div className="mt-6 flex items-center justify-between border-t border-[var(--df-line)] pt-4">
+        <span className="text-xs text-[var(--df-muted)] font-mono">
+          {failedJobsCount > 0 ? (
+            <span className="font-semibold text-rose-700">{failedJobsCount} failed</span>
+          ) : (
+            "0 failures"
+          )}
+        </span>
+        <button
+          type="button"
+          onClick={() => onInspectFailed(queueKey)}
+          className="df-btn df-btn-outline !min-h-8 !px-3 text-xs font-semibold"
+        >
+          Inspect & retry
+        </button>
+      </div>
     </article>
   );
 }
 
 export default function AdminSystemHealthPage() {
   const dispatch = useDispatch();
+  const [selectedQueueForModal, setSelectedQueueForModal] = useState(null);
   const { metrics, loading, error, lastFetchedAt } = useSelector(
     (state) => state.adminHealth
   );
@@ -478,16 +776,22 @@ export default function AdminSystemHealthPage() {
 
               <div className="grid gap-4 lg:grid-cols-3">
                 <QueueCard
+                  queueKey="email"
                   title="Email queue"
                   queue={services?.queues?.email}
+                  onInspectFailed={(key) => setSelectedQueueForModal(key)}
                 />
                 <QueueCard
+                  queueKey="notification"
                   title="Notification queue"
                   queue={services?.queues?.notification}
+                  onInspectFailed={(key) => setSelectedQueueForModal(key)}
                 />
                 <QueueCard
+                  queueKey="storage"
                   title="Storage queue"
                   queue={services?.queues?.storage}
+                  onInspectFailed={(key) => setSelectedQueueForModal(key)}
                 />
               </div>
 
@@ -503,6 +807,14 @@ export default function AdminSystemHealthPage() {
             </section>
           </>
         )}
+
+        {/* Failed Jobs Inspection & Retry Modal */}
+        <FailedJobsModal
+          queueName={selectedQueueForModal}
+          isOpen={Boolean(selectedQueueForModal)}
+          onClose={() => setSelectedQueueForModal(null)}
+          onJobRetried={refresh}
+        />
       </div>
     </main>
   );

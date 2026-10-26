@@ -8,6 +8,15 @@ export const storageQueue = new Queue("storage", {
     backoff: {
         type: "exponential",
         delay: 1000
-    }
+    },
+     removeOnComplete: {
+    age: 3600 * 24, 
+    count: 1000,   
+  },
+  removeOnFail: {
+    age: 3600 * 24 * 7, 
+  },
   }
 });
+
+export const s3Queue = storageQueue;

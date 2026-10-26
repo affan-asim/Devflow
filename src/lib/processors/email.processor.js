@@ -30,7 +30,7 @@ async function sendJobEmail(job) {
         job.data.email,
         job.data.name,
         job.data.plainOtp,
-        job.uuid
+        job.data.uuid || job.id
       );
 
     case "invitation-email":
@@ -38,7 +38,7 @@ async function sendJobEmail(job) {
         job.data.email,
         job.data.name,
         job.data.invitation,
-        job.uuid
+        job.data.uuid || job.id
       );
 
     case "send-company-verification-email":
@@ -47,7 +47,7 @@ async function sendJobEmail(job) {
         job.data.companyName,
         job.data.isVerified,
         job.data?.actionUrl,
-        job.uuid
+        job.data.uuid || job.id
       );
 
     case "employment-event-email":
@@ -96,15 +96,12 @@ export async function processEmail(job) {
     throw new Error(`Email address is missing for job: ${job.name}`);
   }
 
-  // Create the log before contacting the email provider so every send attempt
-  // has a durable record before it can be delivered.
-  const emailLog = await prisma.emailLog.create({
-    data: {
-      email,
-      type,
-      status: EmailLogStatus.PENDING,
-    },
+  const emailLog = await prisma.emailLog.upsert({
+    where: { id: job.data.emailLogId || String(job.id) },
+    update: { status: EmailLogStatus.PENDING },
+    create: { id: String(job.id), email, type, status: EmailLogStatus.PENDING },
   });
+
 
   try {
     const result = await sendJobEmail(job);
